@@ -984,7 +984,7 @@ function statusNuvem(){
     erro:["aviso","Salvo neste aparelho. A conta não respondeu agora; o app tenta de novo sozinho."]};
   const [c,t]=map[nuvem.estado]||map.local;box.className="sync "+c;box.querySelector("span").textContent=t;
 }
-function agendarNuvem(){if(!nuvem.ref||nuvem.estado==="semPermissao")return;clearTimeout(nuvem.timer);nuvem.timer=setTimeout(enviarNuvem,800)}
+function agendarNuvem(){if(!nuvem.ref||nuvem.estado==="semPermissao")return;clearTimeout(nuvem.timer);nuvem.timer=setTimeout(()=>{nuvem.timer=null;enviarNuvem()},800)}
 async function enviarNuvem(){
   if(!nuvem.ref)return;
   if(nuvem.escrevendo){nuvem.pendente=true;return}
@@ -996,15 +996,45 @@ async function enviarNuvem(){
     else{nuvem.estado="erro";if(!nuvem.tentou){nuvem.tentou=true;setTimeout(enviarNuvem,1500+Math.random()*1500)}}}
   finally{nuvem.escrevendo=false;statusNuvem();if(nuvem.pendente)enviarNuvem()}
 }
+// O celular não tem nada anotado (app novo, reinstalado ou dados limpos)
+function vazio(o){return !o.goal&&!o.ciclo.inicio&&!o.medidas.length&&!Object.keys(o.cargas).length&&!Object.keys(o.agua).length
+  &&!Object.values(o.semanas).some(w=>Object.keys(w).length)&&!Object.keys(o.refeicoes).length&&!Object.keys(o.sintomas).length}
+// Junta o que está no celular com o que está na conta, sem apagar nada de nenhum dos lados.
+// Num mesmo dia/semana/medida que existe nos dois, vale o lado salvo por último.
+function mesclar(a,b){
+  const [velho,novo]=a.atualizado>b.atualizado?[b,a]:[a,b];
+  const r=limpar(JSON.parse(JSON.stringify(novo)));
+  const porChave=k=>{for(const x in velho[k])if(!(x in r[k]))r[k][x]=velho[k][x]};
+  ["semanas","agua","refeicoes","sintomas","normal"].forEach(porChave);
+  for(const ex in velho.cargas){const m=new Map((r.cargas[ex]||[]).map(e=>[e[0],e]));velho.cargas[ex].forEach(e=>{if(!m.has(e[0]))m.set(e[0],e)});
+    r.cargas[ex]=[...m.values()].sort((x,y)=>x[0]<y[0]?-1:1).slice(-30)}
+  const dias=new Set(r.medidas.map(m=>m.d));velho.medidas.forEach(m=>{if(!dias.has(m.d))r.medidas.push(m)});
+  r.medidas.sort((x,y)=>x.d<y.d?-1:1);
+  if(!r.goal)r.goal=velho.goal;
+  if(!r.ciclo.inicio&&velho.ciclo.inicio)r.ciclo=velho.ciclo;
+  r.vistoBoas=1;
+  return r;
+}
+const DONO="meutreino:conta";
+const lerDono=()=>{try{return localStorage.getItem(DONO)}catch(e){return null}};
 async function puxarNuvem(){
   if(!nuvem.ref)return;
+  const ref=nuvem.ref;
   try{
-    const snap=await Promise.race([nuvem.ref.get(),new Promise((_,r)=>setTimeout(()=>r({code:"unavailable"}),10000))]);
+    const snap=await Promise.race([ref.get(),new Promise((_,r)=>setTimeout(()=>r({code:"unavailable"}),10000))]);
+    if(ref!==nuvem.ref)return; // saiu da conta enquanto buscava
     const d=snap.exists?snap.data():null;
     let remoto=null;try{remoto=d&&typeof d.s==="string"?limpar(JSON.parse(d.s)):null}catch(e){remoto=null}
-    if(remoto&&remoto.atualizado>S.atualizado){const semObjetivo=!S.goal;S=remoto;gravarLocal();nuvem.estado="conta";definirDescanso();ir(!S.goal?"objetivo":semObjetivo?"treino":tela)}
-    else if(!remoto||remoto.atualizado<S.atualizado){if(S.atualizado||S.goal){await enviarNuvem()}else nuvem.estado="conta"}
-    else nuvem.estado="conta";
+    const semObjetivo=!S.goal,doMesmo=lerDono()===nuvem.uid;
+    let trocou=false,enviar=false;
+    if(!remoto){enviar=!vazio(S)}
+    else if(vazio(S)){S=remoto;S.vistoBoas=1;trocou=true}            // celular novo: a conta manda
+    else if(!doMesmo){S=mesclar(S,remoto);S.atualizado=Date.now();trocou=true;enviar=true} // primeira vez nesta conta: junta os dois
+    else if(remoto.atualizado>S.atualizado){S=remoto;S.vistoBoas=1;trocou=true}
+    else if(remoto.atualizado<S.atualizado)enviar=true;
+    if(trocou){gravarLocal();definirDescanso();if(tela!=="boas")ir(!S.goal?"objetivo":semObjetivo?"treino":tela)}
+    try{if(nuvem.uid)localStorage.setItem(DONO,nuvem.uid)}catch(e){}
+    if(enviar)await enviarNuvem();else nuvem.estado="conta";
   }catch(e){nuvem.estado=e&&e.code==="unavailable"?"erro":"local"}
   statusNuvem();
 }
@@ -1015,7 +1045,7 @@ async function iniciarNuvem(){
     const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
     const id=user?await user.id():null;
     if(!db||!id){nuvem.estado="local";statusNuvem();return}
-    nuvem.ref=db.doc("data/users/"+id+"/estado");nuvem.tipo="claude";
+    nuvem.ref=db.doc("data/users/"+id+"/estado");nuvem.tipo="claude";nuvem.uid="claude:"+id;
     await puxarNuvem();
   }catch(e){nuvem.estado="local";nuvem.ref=null;statusNuvem()}
 }
@@ -1024,6 +1054,7 @@ async function iniciarNuvem(){
 let tela="treino";
 const navBtns=[...document.querySelectorAll("nav.menu button")];
 function ir(v){
+  if(v!==tela)salvarPendentes();
   tela=v;
   for(const id of ["boas","treino","progresso","alimentacao","ciclo","dicas","objetivo"])document.getElementById("v-"+id).hidden=id!==v;
   document.body.classList.toggle("modo-boas",v==="boas");
@@ -1333,7 +1364,7 @@ const CONTA=(()=>{
     "auth/requires-recent-login":"Por segurança, saia e entre de novo na conta, depois tente excluir outra vez.",
     "auth/user-disabled":"Essa conta foi desativada.","auth/operation-not-allowed":"Esse tipo de login ainda não foi ativado no app.",
     "auth/unauthorized-domain":"Login ainda não liberado para este endereço do app."};
-  const erroTxt=e=>{const c=e&&e.code;return c in ERROS?ERROS[c]:"Não deu certo agora. Tente de novo em instantes."};
+  const erroTxt=e=>{const c=e&&e.code;return c in ERROS?ERROS[c]:"Não deu certo agora. Tente de novo em instantes."+(c?" (código: "+String(c).replace(/^auth\//,"")+")":"")};
   const emailOk=v=>/^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/.test(v)&&v.length<=254;
   function senhaProblema(v){
     if(v.length<8)return "A senha precisa ter pelo menos 8 caracteres.";
@@ -1355,6 +1386,7 @@ const CONTA=(()=>{
     await carregarSDK();
     const app=window.firebase.apps&&window.firebase.apps.length?window.firebase.app():window.firebase.initializeApp(cfg());
     auth=window.firebase.auth();fs=window.firebase.firestore();
+    if(cfg().emuladorAuth)try{auth.useEmulator(cfg().emuladorAuth,{disableWarnings:true})}catch(e){} // só nos testes
     try{auth.languageCode="pt"}catch(e){}
     auth.onAuthStateChanged(u=>{usuario=u;mudou()});
     try{await auth.getRedirectResult()}catch(e){msg(erroTxt(e))}
@@ -1367,7 +1399,7 @@ const CONTA=(()=>{
     if(usuario&&verificado(usuario)){
       const d=fs.collection("usuarios").doc(usuario.uid);
       nuvem.ref={get:async()=>{const x=await d.get();return {exists:x.exists,data:()=>x.data()}},set:v=>d.set(v)};
-      nuvem.tipo="firebase";nuvem.estado="conectando";statusNuvem();await puxarNuvem();
+      nuvem.tipo="firebase";nuvem.uid=usuario.uid;nuvem.estado="conectando";statusNuvem();await puxarNuvem();
     }else if(nuvem.tipo==="firebase"){nuvem.ref=null;nuvem.tipo=null;nuvem.estado="local";statusNuvem()}
   }
   function render(){
@@ -1628,7 +1660,7 @@ document.getElementById("formCiclo").addEventListener("submit",e=>{
 });
 document.getElementById("cAjustar").addEventListener("change",e=>{S.ciclo.ajustar=e.target.checked;salvar();const m=document.getElementById("cMsg");m.className="msg-campo ok";m.textContent=e.target.checked?"Treino e alimentação vão se ajustar ao ciclo.":"Ajuste pelo ciclo desligado.";});
 document.getElementById("cInicio").addEventListener("input",()=>{document.getElementById("cInicio").closest(".campo").classList.remove("erro")});
-["cInicio","cDur","cMen"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{const m=document.getElementById("cMsg");m.className="msg-campo";m.textContent="Toque em \"Salvar ciclo\" para guardar."}));
+["cInicio","cDur","cMen"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{const m=document.getElementById("cMsg");m.className="msg-campo";m.textContent="Toque em \"Salvar ciclo\". Se você sair desta tela, salvamos sozinhos."}));
 let confirmaLimpar=false;
 document.getElementById("cLimpar").addEventListener("click",e=>{
   if(!confirmaLimpar){confirmaLimpar=true;e.target.textContent="Toque de novo para apagar";setTimeout(()=>{confirmaLimpar=false;e.target.textContent="Apagar dados do ciclo"},4000);return}
@@ -1852,7 +1884,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="2.2.1";
+const VERSAO="2.3.0";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
@@ -1871,12 +1903,45 @@ function conferirData(){
   if(s!==semana){semana=s;atual=DIAS.includes(h)?h:"Seg"}
   hoje=h;if(tela==="treino")renderTreino();if(tela==="progresso")renderProgresso();
 }
-document.addEventListener("visibilitychange",()=>{if(!document.hidden){conferirData();puxarNuvem()}});
+// Outra aba (ou outra janela do app) salvou: traz os dados novos para esta,
+// para uma aba antiga nunca mostrar dados velhos nem gravar por cima do que foi salvo.
+function sincronizarAbas(){
+  try{
+    const raw=localStorage.getItem(KEY);if(!raw)return false;
+    const o=limpar(JSON.parse(raw));if(!(o.atualizado>S.atualizado))return false;
+    S=o;definirDescanso();
+    let v=tela;if(v==="boas"&&S.vistoBoas)v=S.goal?"treino":"objetivo";else if(v!=="boas"&&v!=="dicas"&&!S.goal)v="objetivo";
+    const y=scrollY;ir(v);if(v===tela)scrollTo(0,y);
+    return true;
+  }catch(e){return false}
+}
+/* O que foi digitado e não salvo é salvo sozinho ao trocar de tela, sair do campo ou fechar o app */
+const FORMS_AUTO=["formMedidas","formPeso","formCiclo"];
+FORMS_AUTO.forEach(id=>{const f=document.getElementById(id);
+  const marca=e=>{if(e.target.matches("input,select"))f.dataset.sujo="1"};
+  f.addEventListener("input",marca);f.addEventListener("change",marca);
+  f.addEventListener("submit",()=>{delete f.dataset.sujo},true);
+  if(id!=="formCiclo")f.addEventListener("focusout",e=>{if(f.dataset.sujo&&!(e.relatedTarget&&f.contains(e.relatedTarget)))setTimeout(()=>{if(f.dataset.sujo&&!f.contains(document.activeElement))f.requestSubmit()},0)});
+});
+function salvarPendentes(){
+  try{
+    const a=document.activeElement;
+    if(a&&a.matches&&a.matches(".carga input"))a.blur();
+    FORMS_AUTO.forEach(id=>{const f=document.getElementById(id);if(!f.dataset.sujo)return;
+      if(id==="formCiclo"&&!document.getElementById("cInicio").value){delete f.dataset.sujo;return}
+      f.requestSubmit()});
+  }catch(e){}
+}
+addEventListener("pagehide",salvarPendentes);
+addEventListener("storage",e=>{if(e.key===KEY||e.key===null)sincronizarAbas()});
+addEventListener("pageshow",e=>{if(e.persisted){sincronizarAbas();conferirData();puxarNuvem()}});
+addEventListener("focus",()=>sincronizarAbas());
+document.addEventListener("visibilitychange",()=>{if(document.hidden){salvarPendentes();if(nuvem.ref&&nuvem.timer){clearTimeout(nuvem.timer);nuvem.timer=null;enviarNuvem()}}else{sincronizarAbas();conferirData();puxarNuvem()}});
 setInterval(()=>{if(!document.hidden&&(semanaId()!==semana||SEMANA_NOMES[new Date().getDay()]!==hoje))conferirData()},60000);
 carregar();
 definirDescanso();
 document.getElementById("usarSemConta").onclick=()=>sairBoas();
-function sairBoas(){S.vistoBoas=1;salvar();ir(S.goal?"treino":"objetivo")}
+function sairBoas(){S.vistoBoas=1;gravarLocal();ir(S.goal?"treino":"objetivo")}
 ir(CONTA.disponivel()&&!S.vistoBoas?"boas":S.goal?"treino":"objetivo");
 requestAnimationFrame(loop);
 statusNuvem();iniciarNuvem();
