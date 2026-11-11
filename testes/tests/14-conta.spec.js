@@ -44,6 +44,7 @@ async function abrirApp(page, { configurado = true } = {}) {
   }
   await page.route(/gstatic\.com|fonts\./, r => r.abort());
   await page.goto(APP + 'index.html');
+  if (configurado) await page.click('#usarSemConta'); // tela de boas-vindas da primeira abertura
   await page.click('#goal-gluteo');
   await nav(page, 'objetivo');
 }
@@ -71,6 +72,79 @@ test.describe('Conta: aparece só quando o login está configurado', () => {
     await expect(page.locator('#contaCard')).toBeVisible();
     await expect(page.locator('#entrarGoogle')).toHaveText('Entrar com Google');
     await expect(page.locator('#syncStatus')).toContainText('Entre na sua conta');
+  });
+});
+
+test.describe('Tela de boas-vindas (primeira abertura)', () => {
+  async function abrirPrimeiraVez(page) {
+    await page.route('**/firebase-config.js', r => r.fulfill({ contentType: 'text/javascript', body: CONFIG }));
+    await page.addInitScript(FIREBASE_FALSO);
+    await page.route(/gstatic\.com|fonts\./, r => r.abort());
+    await page.goto(APP + 'index.html');
+  }
+  test('mostra as opções de login e o uso sem conta, sem menu nem cabeçalho', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await expect(page.locator('#v-boas')).toBeVisible();
+    await expect(page.locator('#boasLogin #entrarGoogle')).toBeVisible();
+    await expect(page.locator('#boasLogin #abaCriar')).toBeVisible();
+    await expect(page.locator('#usarSemConta')).toBeVisible();
+    await expect(page.locator('nav.menu')).toBeHidden();
+    await expect(page.locator('.topo')).toBeHidden();
+    await expect(page.locator('#v-boas .copy')).toContainText('© 2026 WR Lui');
+  });
+  test('"Usar sem conta" segue para o objetivo e não aparece de novo', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await page.click('#usarSemConta');
+    await expect(page.locator('#v-objetivo')).toBeVisible();
+    await expect(page.locator('nav.menu')).toBeVisible();
+    await expect(page.locator('#contaCard #contaFora')).toHaveCount(1); // as opções de login voltam para o Perfil
+    await page.click('#goal-gluteo');
+    await page.reload();
+    await expect(page.locator('#v-boas')).toBeHidden();
+    await expect(page.locator('#v-treino')).toBeVisible();
+  });
+  test('entrar com Google na boas-vindas leva para a escolha do objetivo', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await page.click('#entrarGoogle');
+    await expect(page.locator('#v-objetivo')).toBeVisible();
+    await expect(page.locator('#contaDentro')).toBeVisible();
+    await expect(page.locator('#contaTipo')).toHaveText('Entrou com Google');
+    expect(await page.evaluate(() => S.vistoBoas)).toBe(1);
+  });
+  test('criar conta na boas-vindas leva ao Perfil com o aviso de confirmar o e-mail', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await criarConta(page, 'nova@teste.com');
+    await expect(page.locator('#v-objetivo')).toBeVisible();
+    await expect(page.locator('#contaVerificar')).toBeVisible();
+    await expect(page.locator('#toast')).toContainText('Confirme seu e-mail');
+  });
+  test('validação funciona também na boas-vindas', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await page.fill('#lEmail', 'errado'); await page.click('#formEntrar button[type=submit]');
+    await expect(page.locator('#lEmailErr')).toHaveText('Esse e-mail não parece certo.');
+    await expect(page.locator('#v-boas')).toBeVisible();
+  });
+  test('apagar todos os dados mostra a boas-vindas de novo', async ({ page }) => {
+    await abrirPrimeiraVez(page);
+    await page.click('#usarSemConta'); await page.click('#goal-gluteo');
+    await nav(page, 'objetivo'); await page.click('#apagar'); await page.click('#simApagar');
+    await page.reload();
+    await expect(page.locator('#v-boas')).toBeVisible();
+  });
+  test('no link do Claude não tem boas-vindas', async ({ page }) => {
+    await page.route(/fonts\./, r => r.abort());
+    await page.goto('http://127.0.0.1:8765/index.html');
+    await expect(page.locator('#v-boas')).toBeHidden();
+    await expect(page.locator('#v-objetivo')).toBeVisible();
+  });
+  for (const tema of ['light', 'dark']) test('boas-vindas sem falhas graves de acessibilidade (' + tema + ')', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: tema });
+    await abrirPrimeiraVez(page);
+    const r = await new AxeBuilder({ page }).include('#v-boas').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(r.violations.filter(x => ['serious', 'critical'].includes(x.impact)).map(x => x.id + ' ' + x.nodes.map(n => n.target.join(' ')).join(','))).toEqual([]);
+    const fora = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(fora).toBe(0);
+    await page.screenshot({ path: 'capturas/boas-vindas-' + tema + '-' + test.info().project.name.replace(/ /g, '_') + '.png', fullPage: true });
   });
 });
 
@@ -229,7 +303,7 @@ test.describe('Confirmação de e-mail e sincronização', () => {
   test('sem internet para carregar o login: avisa e o app segue funcionando', async ({ page }) => {
     await page.route('**/firebase-config.js', r => r.fulfill({ contentType: 'text/javascript', body: CONFIG }));
     await page.route(/gstatic\.com|fonts\./, r => r.abort());
-    await page.goto(APP + 'index.html'); await page.click('#goal-gluteo'); await nav(page, 'objetivo');
+    await page.goto(APP + 'index.html'); await page.click('#usarSemConta'); await page.click('#goal-gluteo'); await nav(page, 'objetivo');
     await expect(page.locator('#contaMsg')).toContainText('Sem internet');
     await page.click('#entrarGoogle');
     await expect(page.locator('#contaMsg')).toContainText('Sem internet');

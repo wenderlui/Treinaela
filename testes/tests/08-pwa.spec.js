@@ -15,6 +15,8 @@ test.describe('App do iPhone (PWA)', () => {
     await page.goto(PWA);
     await page.evaluate(() => navigator.serviceWorker.ready);
     await page.reload(); await page.waitForFunction(() => navigator.serviceWorker.controller);
+    // o service worker busca a configuração real do login: aparece a boas-vindas da primeira abertura
+    if (await page.locator('#usarSemConta').isVisible()) await page.click('#usarSemConta');
     await page.click('#goal-gluteo');
     await context.setOffline(true);
     await page.reload();

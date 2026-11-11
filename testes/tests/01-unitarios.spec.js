@@ -36,7 +36,7 @@ test.describe('Unitários', () => {
 
   test('limpar: entradas estranhas viram estado vazio', async ({ page }) => {
     const r = await page.evaluate(() => [null, undefined, 5, 'x', [], [1]].map(v => JSON.stringify(limpar(v))));
-    for (const x of r) expect(x).toBe(JSON.stringify({ goal: null, semanas: {}, cargas: {}, medidas: [], agua: {}, ciclo: { inicio: "", dur: 28, menst: 5, ajustar: true }, peso: null, refeicoes: {}, sintomas: {}, normal: {}, atualizado: 0 }));
+    for (const x of r) expect(x).toBe(JSON.stringify({ goal: null, semanas: {}, cargas: {}, medidas: [], agua: {}, ciclo: { inicio: "", dur: 28, menst: 5, ajustar: true }, peso: null, refeicoes: {}, sintomas: {}, normal: {}, atualizado: 0, vistoBoas: 0 }));
   });
 
   test('integridade: todo objetivo tem 5 dias, exercícios válidos e animação existente', async ({ page }) => {

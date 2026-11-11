@@ -5,6 +5,8 @@ const test = base.test.extend({
     page.on('pageerror', e => page.errs.push(e.message));
     page.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|net::/.test(m.text())) page.errs.push('console: ' + m.text()); });
     await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+    // por padrão o login fica desligado (como no link do Claude); os testes de conta ligam o seu
+    await page.route('**/firebase-config.js', r => r.fulfill({ contentType: 'text/javascript', body: 'window.TREINA_ELA_FIREBASE={apiKey:"COLE_AQUI"};' }));
     await use(page);
   },
 });

@@ -208,6 +208,17 @@ nav.menu button[aria-current="page"]{color:var(--accent)}
 .trocas s{color:var(--muted)}
 .trocas b{color:var(--done-ink)}
 @media (max-width:370px){.prato{grid-template-columns:1fr;justify-items:center}}
+/* Boas-vindas */
+body.modo-boas .topo,body.modo-boas .fixo{display:none!important}
+body.modo-boas{padding-bottom:32px}
+.boas{gap:18px}
+.boas-topo{display:flex;flex-direction:column;gap:8px;padding-top:12px}
+.boas-topo .marca{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,13vw,3.6rem);line-height:.95;margin:0;text-transform:uppercase}
+.boas-topo .marca span{color:var(--accent)}
+.boas-topo p{margin:0;font-size:1.05rem;max-width:34ch}
+.boas-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.boas-lista li{display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+.boas-lista li::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:7px}
 /* Conta */
 .conta-topo{display:flex;align-items:center;gap:12px}
 .avatar{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 1.2rem var(--display);text-transform:uppercase}
@@ -311,6 +322,27 @@ nav.menu button[aria-current="page"]{color:var(--accent)}
   </header>
 
   <!-- TREINO -->
+  <section class="view boas" id="v-boas" aria-label="Boas-vindas" hidden>
+    <div class="boas-topo">
+      <h2 class="marca">Treina <span>Ela</span></h2>
+      <p>Seu treino de academia, com alimentação e um cronograma do mês que acompanha o seu ciclo.</p>
+    </div>
+    <ul class="boas-lista">
+      <li>Treinos por objetivo, com animação de cada exercício</li>
+      <li>Cardápio e metas de proteína e água para o seu objetivo</li>
+      <li>Treino e alimentação ajustados à fase do ciclo</li>
+    </ul>
+    <div class="card" id="boasLogin">
+      <h3>Entre na sua conta</h3>
+    </div>
+    <div class="card">
+      <h3>Ou use sem conta</h3>
+      <p class="small" style="margin:0">Tudo funciona do mesmo jeito. Seus dados ficam salvos só neste celular, e você pode criar uma conta depois, em Perfil.</p>
+      <button class="btn" type="button" id="usarSemConta">Usar sem conta</button>
+    </div>
+    <p class="copy">Ao continuar, você concorda com os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.<br>© 2026 WR Lui. Todos os direitos reservados.</p>
+  </section>
+
   <section class="view" id="v-treino" aria-label="Treino">
     <div class="card semana" id="semanaCard">
       <div class="sem-top"><span id="semLbl">Progresso da semana</span><b id="semPct">0%</b></div>
@@ -863,10 +895,11 @@ const num=(v,min,max)=>{v=Number(v);return Number.isFinite(v)&&v>=min&&v<=max?Ma
 const isDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
 let salvaOk=true;
 const CICLO0=()=>({inicio:"",dur:28,menst:5,ajustar:true});
-let S={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0};
+let S={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0,vistoBoas:0};
 
 function limpar(o){
-  const n={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0};
+  const n={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0,vistoBoas:0};
+  if(o&&o.vistoBoas===1)n.vistoBoas=1;
   if(!o||typeof o!=="object"||Array.isArray(o))return n;
   if(GOALS.includes(o.goal))n.goal=o.goal;
   if(o.semanas&&typeof o.semanas==="object")for(const k in o.semanas){
@@ -978,7 +1011,11 @@ let tela="treino";
 const navBtns=[...document.querySelectorAll("nav.menu button")];
 function ir(v){
   tela=v;
-  for(const id of ["treino","progresso","alimentacao","ciclo","dicas","objetivo"])document.getElementById("v-"+id).hidden=id!==v;
+  for(const id of ["boas","treino","progresso","alimentacao","ciclo","dicas","objetivo"])document.getElementById("v-"+id).hidden=id!==v;
+  document.body.classList.toggle("modo-boas",v==="boas");
+  const fora=document.getElementById("contaFora");
+  if(v==="boas")document.getElementById("boasLogin").appendChild(fora);
+  else if(fora.parentNode.id==="boasLogin")document.getElementById("contaCard").insertBefore(fora,document.getElementById("contaDentro"));
   document.getElementById("subObjetivo").textContent=S.goal?OBJ[S.goal].n:"Escolha seu objetivo";
   const ativo=v==="dicas"?"objetivo":v;
   navBtns.forEach(b=>b.dataset.v===ativo?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
@@ -1296,6 +1333,7 @@ const CONTA=(()=>{
   function verificado(u){return !!u&&(u.emailVerified||(u.providerData||[]).some(p=>p.providerId==="google.com"))}
   async function mudou(){
     render();
+    if(usuario&&tela==="boas"){sairBoas();if(!verificado(usuario))toast("Conta criada! Confirme seu e-mail (veja em Perfil)")}
     if(usuario&&verificado(usuario)){
       const d=fs.collection("usuarios").doc(usuario.uid);
       nuvem.ref={get:async()=>{const x=await d.get();return {exists:x.exists,data:()=>x.data()}},set:v=>d.set(v)};
@@ -1776,7 +1814,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="2.0.0";
+const VERSAO="2.1.0";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
@@ -1799,7 +1837,9 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden){conferirD
 setInterval(()=>{if(!document.hidden&&(semanaId()!==semana||SEMANA_NOMES[new Date().getDay()]!==hoje))conferirData()},60000);
 carregar();
 definirDescanso();
-ir(S.goal?"treino":"objetivo");
+document.getElementById("usarSemConta").onclick=()=>sairBoas();
+function sairBoas(){S.vistoBoas=1;salvar();ir(S.goal?"treino":"objetivo")}
+ir(CONTA.disponivel()&&!S.vistoBoas?"boas":S.goal?"treino":"objetivo");
 requestAnimationFrame(loop);
 statusNuvem();iniciarNuvem();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
