@@ -1142,6 +1142,7 @@ function renderTreino(){
       menos.onclick=()=>muda(-1);mais.onclick=()=>muda(1);
       inp.onchange=()=>{const t=inp.value.trim();if(t===""){mostra();return}
         const v=lerNum(t);if(v===null||v<0||v>500){mostra();info.textContent="Use um número de 0 a 500";return}
+        if(v===ultimaCarga(n)){mostra();return}
         gravarCarga(n,v);mostra();atualiza();toast("Carga salva: "+fmtN(v)+" kg")};
       inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();inp.blur()}};
     }
@@ -1884,7 +1885,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="2.3.0";
+const VERSAO="2.3.1";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
@@ -1926,7 +1927,7 @@ FORMS_AUTO.forEach(id=>{const f=document.getElementById(id);
 function salvarPendentes(){
   try{
     const a=document.activeElement;
-    if(a&&a.matches&&a.matches(".carga input"))a.blur();
+    if(a&&a.matches&&a.matches(".carga input")){a.blur();if(a.onchange)a.onchange()}
     FORMS_AUTO.forEach(id=>{const f=document.getElementById(id);if(!f.dataset.sujo)return;
       if(id==="formCiclo"&&!document.getElementById("cInicio").value){delete f.dataset.sujo;return}
       f.requestSubmit()});
