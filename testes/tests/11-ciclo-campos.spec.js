@@ -133,7 +133,7 @@ test.describe('Cronograma do mês', () => {
 
 test.describe('Revisão dos outros campos', () => {
   test('BUG corrigido: carga com vírgula (32,5) não vira 325', async ({ page }) => {
-    await abrir(page, { goal: 'gluteo' });
+    await abrir(page, { goal: 'gluteo' }); await page.click('#tab-Seg');
     const inp = page.locator('.carga input').first();
     await inp.click(); await inp.fill(''); await page.keyboard.type('32,5'); await page.keyboard.press('Enter');
     await expect(inp).toHaveValue('32,5');

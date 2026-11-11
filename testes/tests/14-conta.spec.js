@@ -85,7 +85,7 @@ test.describe('Conta: acessibilidade e layout', () => {
     }
     await page.click('#entrarGoogle');
     const r2 = await new AxeBuilder({ page }).include('#contaCard').withTags(['wcag2a', 'wcag2aa']).analyze();
-    expect(r2.violations.filter(x => ['serious', 'critical'].includes(x.impact)).map(x => x.id)).toEqual([]);
+    expect(r2.violations.filter(x => ['serious', 'critical'].includes(x.impact)).map(x => x.id + ' ' + x.nodes.map(n => n.target.join(' ') + ' ' + (n.any[0] && n.any[0].message)).join(','))).toEqual([]);
   });
   test('botões do login com tamanho bom para o dedo e sem sair da tela', async ({ page }) => {
     await abrirApp(page); await page.click('#abaCriar');

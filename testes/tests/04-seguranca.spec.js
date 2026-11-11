@@ -32,7 +32,10 @@ test.describe('Segurança', () => {
     await abrir(page, { goal: 'gluteo' });
     const links = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map(a => [a.href, a.target, a.rel]));
     expect(links.length).toBeGreaterThan(0);
-    for (const [h, t, r] of links) { expect(h.startsWith('https://www.youtube.com/') || h.startsWith('https://www.google.com/')).toBeTruthy(); expect(t).toBe('_blank'); expect(r).toContain('noopener'); }
+    for (const [h, t, r] of links) {
+      const interno = new URL(h).origin === new URL(page.url()).origin; // privacidade.html e termos.html do próprio app
+      if (!interno) expect(h.startsWith('https://www.youtube.com/') || h.startsWith('https://www.google.com/'), h).toBeTruthy();
+      expect(t).toBe('_blank'); expect(r).toContain('noopener'); }
   });
 
   test('app não envia dados para nenhum servidor', async ({ page }) => {

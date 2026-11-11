@@ -103,7 +103,7 @@ test.describe('Medidas e peso', () => {
 
 test.describe('Cargas', () => {
   test('salvar com Enter e ao sair do campo; excluir com confirmação', async ({ page }) => {
-    await abrir(page, { goal: 'gluteo' });
+    await abrir(page, { goal: 'gluteo' }); await page.click('#tab-Seg');
     const inp = page.locator('.carga input').first();
     await inp.fill('20'); await inp.press('Enter');
     await expect(page.locator('#toast')).toHaveText('Carga salva: 20 kg');

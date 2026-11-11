@@ -7,7 +7,7 @@ test.describe('Ajuda e clareza dos campos', () => {
     const falhas = [];
     for (const v of TELAS) {
       await nav(page, v);
-      falhas.push(...await page.evaluate(v => [...document.querySelectorAll('input,select')].filter(e => e.offsetParent || e.closest('.switch')).flatMap(e => {
+      falhas.push(...await page.evaluate(v => [...document.querySelectorAll('input,select')].filter(e => e.offsetParent || (e.closest('.switch') && e.closest('.switch').offsetParent)).flatMap(e => {
         const f = []; const lab = e.labels && e.labels[0];
         if (!lab || !lab.textContent.trim()) f.push(v + ': ' + e.id + ' sem rótulo');
         const grupo = e.closest('.campo,.carga,.rot');
@@ -67,6 +67,7 @@ test.describe('Ajuda e clareza dos campos', () => {
 
   test('séries lidas em voz alta por extenso (acessibilidade)', async ({ page }) => {
     await abrir(page, { goal: 'gluteo' });
+    await page.click('#tab-Seg');
     await expect(page.locator('.ex .tag').first()).toHaveAttribute('aria-label', '4 séries de 12 repetições');
     await page.click('#tab-Qua');
     await expect(page.locator('.ex .tag').nth(1)).toHaveAttribute('aria-label', '3 séries de 40 segundos');
