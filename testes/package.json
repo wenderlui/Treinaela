@@ -1,0 +1,10 @@
+{
+  "name": "treina-ela-testes",
+  "private": true,
+  "description": "Testes automáticos do Treina Ela. © 2026 WR Lui. Todos os direitos reservados.",
+  "scripts": { "test": "playwright test" },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@axe-core/playwright": "4.10.1"
+  }
+}

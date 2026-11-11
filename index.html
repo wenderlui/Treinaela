@@ -1,0 +1,1807 @@
+<!doctype html>
+<!-- Treina Ela · © 2026 WR Lui. Todos os direitos reservados. -->
+<html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Treina Ela">
+<meta name="theme-color" content="#d6336c">
+<meta name="description" content="Treino de academia para mulheres: treinos por objetivo, alimentação e cronograma do mês pelo ciclo.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<script src="firebase-config.js"></script>
+<title>Treina Ela</title>
+<meta name="author" content="WR Lui">
+<meta name="copyright" content="© 2026 WR Lui. Todos os direitos reservados.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: app de uma coluna. Cabeçalho com objetivo e botão de IA, quatro telas (Treino, Progresso, Dicas, Objetivo) e barra de navegação fixa embaixo */
+:root{
+  --bg:#f7f4f6; --surface:#ffffff; --fg:#231a21; --muted:#7a6a75; --line:#e7dde3;
+  --accent:#d6336c; --accent-soft:#fbe3ec; --accent-ink:#a3194a; --on-accent:#ffffff; --on-done:#ffffff; --done-ink:#1d6e47; --done:#2f9e6b; --stage:#f3edf1; --warn:#b7791f;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17121a; --surface:#221b25; --fg:#f4ecf1; --muted:#a898a3; --line:#352a38;
+  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17121a; --surface:#221b25; --fg:#f4ecf1; --muted:#a898a3; --line:#352a38;
+  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 150px}
+body.sem-timer{padding-bottom:96px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button,input,textarea,select{font:inherit;color:inherit}
+input,select,textarea{box-sizing:border-box;max-width:100%}
+button:focus-visible,a:focus-visible,canvas:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Cabeçalho */
+.topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,8.4vw,2.3rem);white-space:nowrap;line-height:1;margin:0;text-transform:uppercase;letter-spacing:.01em}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.92rem}
+.topo>div{min-width:0}
+@media (max-width:370px){.timer .lbl{display:none}.ia-btn{padding:8px 10px}}
+.confirma{display:flex;flex-direction:column;gap:8px}
+.ia-btn{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-ink);
+  font-weight:700;font-size:.85rem;padding:8px 12px;border-radius:99px;cursor:pointer;min-height:44px}
+.ia-btn svg{display:block;flex:none;width:16px;height:16px}
+
+/* Elementos comuns */
+h2{font-family:var(--display);font-weight:800;font-size:1.8rem;margin:0;text-transform:uppercase;text-wrap:balance;line-height:1.05}
+h3{font-family:var(--display);font-weight:800;font-size:1.25rem;margin:0;text-transform:uppercase;letter-spacing:.02em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.btn{font-weight:600;font-size:.88rem;padding:9px 13px;border-radius:10px;border:1px solid var(--accent);color:var(--accent-ink);background:transparent;text-decoration:none;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.btn.fill{background:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.view[hidden]{display:none!important}
+.view{display:flex;flex-direction:column;gap:16px}
+
+/* Semana */
+.sem-top{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;gap:8px}
+.sem-top b{font:800 1.4rem var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.semana.completa{border-color:var(--done)}
+.semana.completa .sem-top b{color:var(--done)}
+.semana.completa .bar i{background:var(--done)}
+
+/* Abas de dias */
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.tabs button{font:700 1rem var(--display);text-transform:uppercase;letter-spacing:.05em;padding:11px 0;min-height:48px;border:1px solid var(--line);
+  border-radius:12px;background:var(--surface);cursor:pointer;position:relative}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tabs button .hoje{display:block;font:600 .62rem var(--body);letter-spacing:.08em;opacity:.8}
+.tabs button.ok::after{content:"✓";position:absolute;top:3px;right:6px;font:700 .7rem var(--body);color:var(--done)}
+.tabs button.ok[aria-selected="true"]::after{color:var(--on-accent)}
+.head{display:flex;justify-content:space-between;align-items:end;gap:12px}
+.head p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.pct{font:800 1.6rem var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.aviso{background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:.9rem}
+
+/* Exercícios */
+.list{display:flex;flex-direction:column;gap:12px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.ex.done{opacity:.62}
+.ex.done .nome{text-decoration:line-through}
+.ex-top{display:flex;gap:12px;align-items:center}
+.chk{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:transparent;cursor:pointer;display:grid;place-items:center;color:transparent;padding:0;line-height:0}
+.chk svg{display:block}
+.ex.done .chk{background:var(--done);border-color:var(--done);color:var(--on-done)}
+.tit{min-width:0;flex:1}
+.nome{font-weight:700;font-size:1.06rem;margin:0}
+.tag{display:inline-block;margin-top:4px;font-size:.78rem;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.demo{display:block;width:100%;max-width:100%;aspect-ratio:10/7;background:var(--stage);border-radius:12px;cursor:pointer}
+.dica{font-size:.9rem;color:var(--muted);margin:0}
+.carga{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.88rem}
+.carga label{font-weight:600}
+.step{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.step button{width:44px;height:44px;border:0;background:var(--stage);cursor:pointer;font-size:1.1rem;font-weight:700}
+.step input{width:64px;height:44px;border:0;text-align:center;background:var(--surface);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.carga .muted{font-size:.8rem}
+
+/* Objetivos */
+.goals{display:grid;grid-template-columns:1fr;gap:10px}
+.goal{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;cursor:pointer}
+.goal[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.goal .ic{grid-row:span 3;width:44px;height:44px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 1.2rem var(--display)}
+.goal b{font-size:1.04rem}
+.goal span{color:var(--muted);font-size:.88rem}
+.goal[aria-pressed="true"] span:not(.ic){color:var(--fg)}
+.goal em{font-style:normal;font-size:.76rem;font-weight:600;color:var(--accent-ink);letter-spacing:.04em;text-transform:uppercase}
+
+/* Dicas */
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;box-sizing:border-box;align-items:center;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::after{content:"+";color:var(--accent);font-weight:800}
+details[open] summary::after{content:"−"}
+details ul{margin:0 0 12px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+details li{font-size:.92rem}
+.filtros{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.filtros button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px;min-height:44px;font-size:.85rem;font-weight:600;cursor:pointer}
+.filtros button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* Progresso */
+.agua{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.agua button{height:52px;border:2px solid var(--line);border-radius:8px 8px 14px 14px;background:transparent;cursor:pointer;position:relative;overflow:hidden;padding:0}
+.agua button.cheio{border-color:#3b8ed0;background:linear-gradient(to top,#3b8ed0 70%,transparent 70%)}
+.hist{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;align-items:end;height:90px}
+.hist div{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.hist i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px}
+.hist i.cheia{background:var(--done)}
+.tabela{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+.tabela th{text-align:left;font-weight:600;color:var(--muted);font-size:.78rem;padding:4px 6px 4px 0;border-bottom:1px solid var(--line)}
+.tabela td{padding:7px 6px 7px 0;border-bottom:1px solid var(--line)}
+.up{color:var(--done);font-weight:700}
+.down{color:var(--accent);font-weight:700}
+.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.form .campo .rot>label{font-size:.84rem}
+.form input{border:1px solid var(--line);border-radius:10px;padding:9px;min-height:44px;font-size:16px;background:var(--bg);min-width:0;width:100%;font-weight:600}
+.ciclo{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px}
+.ciclo label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:600;color:var(--muted)}
+.fase{border-left:4px solid var(--accent);padding:4px 0 4px 10px}
+.scroll-x{overflow-x:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Barra do cronômetro e navegação */
+.fixo{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:5;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));padding-bottom:env(safe-area-inset-bottom,0px)}
+.timer{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.timer .t{font:800 1.7rem var(--display);font-variant-numeric:tabular-nums;min-width:3.6ch}
+.timer .lbl{flex:1;color:var(--muted);font-size:.78rem;line-height:1.2;min-width:0}
+.timer .btn{padding:6px 9px;min-height:44px;font-size:.82rem}
+nav.menu{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.menu button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding:8px 0 10px;cursor:pointer;color:var(--muted);font-size:.72rem;font-weight:600;min-height:58px;min-width:0;line-height:1.1;white-space:nowrap}
+nav.menu svg{display:block;flex:none;width:24px;height:24px}
+nav.menu button[aria-current="page"]{color:var(--accent)}
+
+/* Painel da IA */
+.painel{position:fixed;inset:0;z-index:20;background:rgba(20,10,18,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:600px;max-height:88%;border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  padding:14px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:10px}
+.sheet-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fechar{border:0;background:var(--stage);border-radius:99px;width:44px;height:44px;font-size:1.2rem;cursor:pointer}
+.chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.msg{max-width:88%;padding:10px 12px;border-radius:14px;white-space:pre-wrap;font-size:.93rem;overflow-wrap:anywhere}
+.msg.eu{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:4px}
+.msg.ia{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+.sugs{display:flex;gap:6px;flex-wrap:wrap}
+.sugs button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 12px;min-height:44px;font-size:.82rem;cursor:pointer;text-align:left}
+.envio{display:flex;gap:8px}
+.envio textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);resize:none;height:48px;font-size:16px}
+/* Alimentação */
+.metas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.meta{background:var(--stage);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.meta b{font:800 1.6rem var(--display);font-variant-numeric:tabular-nums;line-height:1.1}
+.meta span{font-size:.8rem;color:var(--fg);opacity:.85}
+.peso-linha{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.peso-linha .campo input{border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--bg);min-height:44px;font-size:16px;font-weight:600;width:100%}
+.peso-linha label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:600;color:var(--muted);flex:1;min-width:140px}
+.peso-linha input{border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--bg);min-height:44px;font-size:16px;font-weight:600;width:100%}
+.prato{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}
+.prato .disco{width:120px;height:120px;border-radius:50%;border:6px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.legenda{display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.legenda div{display:flex;gap:8px;align-items:center}
+.legenda i{flex:none;width:14px;height:14px;border-radius:4px}
+.refeicoes{display:flex;flex-direction:column;gap:10px}
+.ref{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start}
+.ref.feita{background:var(--stage)}
+.ref .chk{grid-row:span 3}
+.ref.feita .chk{background:var(--done);border-color:var(--done);color:var(--on-done)}
+.ref-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ref-top b{font-size:.98rem}
+.ref-top span{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.ref p{margin:0;font-size:.92rem}
+.ref .outra{justify-self:start;background:none;border:0;color:var(--accent-ink);font-weight:600;font-size:.84rem;padding:10px 0 0;min-height:44px;cursor:pointer;text-decoration:underline}
+.lista-simples{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.trocas{display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.trocas div{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.trocas s{color:var(--muted)}
+.trocas b{color:var(--done-ink)}
+@media (max-width:370px){.prato{grid-template-columns:1fr;justify-items:center}}
+/* Conta */
+.conta-topo{display:flex;align-items:center;gap:12px}
+.avatar{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 1.2rem var(--display);text-transform:uppercase}
+.conta-topo .quem{min-width:0;flex:1}
+.conta-topo .quem b{display:block;overflow-wrap:anywhere}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font-weight:600;cursor:pointer}
+.btn-google svg{flex:none;width:20px;height:20px}
+.ou{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.84rem}
+.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--line)}
+.abas{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--stage);border-radius:12px;padding:4px}
+.abas button{border:0;border-radius:9px;background:none;min-height:44px;font-weight:600;font-size:.88rem;cursor:pointer;color:var(--muted)}
+.abas button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.form-conta{display:flex;flex-direction:column;gap:10px}
+.form-conta .campo input{border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg);color:var(--fg);min-height:48px;font-size:16px;font-weight:500;width:100%}
+.campo .erro-campo{margin:0;font-size:.84rem;color:var(--accent-ink);font-weight:600}
+.campo input[aria-invalid="true"]{border-color:var(--accent)}
+.senha-box{position:relative}
+.senha-box input{padding-right:84px!important}
+.ver-senha{position:absolute;right:4px;top:2px;min-height:44px;border:0;background:none;color:var(--accent-ink);font-weight:600;font-size:.84rem;cursor:pointer;padding:0 10px}
+.alerta{border-radius:12px;padding:10px 12px;font-size:.9rem;background:var(--accent-soft)}
+.alerta.ok{background:var(--stage);border-left:4px solid var(--done)}
+.copy{font-size:.78rem;color:var(--muted);text-align:center;margin:0}
+.copy a{color:var(--accent-ink)}
+/* Aviso de salvo */
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:30;background:var(--fg);color:var(--bg);
+  padding:10px 16px;border-radius:99px;font-size:.9rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
+.toast.erro{background:var(--accent);color:var(--on-accent)}
+.acoes-linha{display:flex;gap:4px;justify-content:flex-end}
+.mini{border:0;background:none;color:var(--accent-ink);font-weight:600;font-size:.82rem;min-height:44px;min-width:44px;padding:0 6px;cursor:pointer;text-decoration:underline}
+.mini.perigo{color:var(--accent-ink)}
+.tabela tr.editando td{background:var(--accent-soft)}
+.edit-aviso{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--accent-soft);border-radius:10px;padding:4px 4px 4px 12px;font-size:.88rem;font-weight:600}
+.sync{display:flex;gap:8px;align-items:flex-start;font-size:.88rem}
+.sync i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--muted)}
+.sync.ok i{background:var(--done)}
+.sync.aviso i{background:var(--warn)}
+/* Ajuda (?) */
+.rot{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:44px}
+.rot>label,.rot>.t-rot{font-size:.9rem;font-weight:600;color:var(--fg);line-height:1.3;min-width:0}
+.rot>h3,.rot>h2{min-width:0}
+.ajuda{flex:none;width:44px;height:44px;margin:-6px -10px -6px 0;border:0;background:none;cursor:pointer;display:grid;place-items:center;padding:0}
+.ajuda::before{content:"?";display:block;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--accent-ink);color:var(--accent-ink);font:700 .8rem/21px var(--body);text-align:center;box-sizing:border-box}
+.ajuda[aria-expanded="true"]::before{background:var(--accent-ink);color:var(--surface)}
+.ajuda-txt{margin:0;background:var(--accent-soft);color:var(--fg);border-radius:10px;padding:10px 12px;font-size:.9rem;line-height:1.45;font-weight:400}
+.linha-ciclo{display:flex;height:14px;border-radius:99px;overflow:hidden;position:relative;margin-top:14px}
+.linha-ciclo i{display:block;height:100%}
+.linha-ciclo b{position:absolute;top:-4px;width:4px;height:22px;border-radius:2px;background:var(--fg);transform:translateX(-2px)}
+.linha-leg{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);gap:4px}
+/* Campos */
+.campo{display:flex;flex-direction:column;gap:6px;min-width:0}
+.campo input,.campo select{border:1px solid var(--line);border-radius:10px;padding:0 12px;min-width:0;background:var(--bg);color:var(--fg);min-height:48px;font-size:16px;font-weight:600;width:100%;
+  -webkit-appearance:none;appearance:none;display:block;text-align:left}
+.campo select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 21px,calc(100% - 12px) 21px;background-size:6px 6px;background-repeat:no-repeat;padding-right:32px}
+.campo input::-webkit-date-and-time-value{text-align:left}
+.campo input::-webkit-calendar-picker-indicator{opacity:.7}
+.campo.erro input,.campo.erro select{border-color:var(--accent)}
+.grade2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grade2 .full{grid-column:1/-1}
+.msg-campo{margin:0;font-size:.86rem;min-height:1.2em}
+.msg-campo.ok{color:var(--done)}
+.msg-campo.erro{color:var(--accent-ink)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;font-weight:600;font-size:.94rem;cursor:pointer}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch i{flex:none;width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;transition:background .2s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch input:checked+i{background:var(--done)}
+.switch input:checked+i::after{transform:translateX(20px)}
+.switch input:focus-visible+i{outline:3px solid var(--accent);outline-offset:2px}
+/* Ciclo */
+.fase-banner{border-left:5px solid var(--fase,var(--accent))}
+.fase-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.fase-top b{font:800 1.15rem var(--display);text-transform:uppercase;letter-spacing:.02em}
+.fase-top span{font-size:.8rem;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 13px;min-height:44px;font-size:.86rem;font-weight:600;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.modo{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--stage);border-radius:12px;padding:8px 10px 8px 12px;font-size:.88rem}
+.semanas{display:flex;flex-direction:column;gap:10px}
+.semana-c{border:1px solid var(--line);border-left:5px solid var(--fase);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.semana-c.atual{background:var(--stage);border-color:var(--fase)}
+.semana-c .fase-top b{font-size:1rem}
+.semana-c p{margin:0;font-size:.9rem}
+.semana-c p strong{font-weight:700}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--fase);color:#fff}
+.tag.mod{background:var(--stage);color:var(--fg)}
+@media (prefers-reduced-motion:reduce){.bar i,.switch i,.switch i::after{transition:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header class="topo">
+    <div>
+      <h1>Treina <span>Ela</span></h1>
+      <p class="sub" id="subObjetivo">Escolha seu objetivo</p>
+    </div>
+    <button class="ia-btn" type="button" id="abrirIA" aria-label="Tirar dúvidas com a IA">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7z"/><circle cx="19" cy="19" r="2"/></svg>
+      Dúvidas
+    </button>
+  </header>
+
+  <!-- TREINO -->
+  <section class="view" id="v-treino" aria-label="Treino">
+    <div class="card semana" id="semanaCard">
+      <div class="sem-top"><span id="semLbl">Progresso da semana</span><b id="semPct">0%</b></div>
+      <div class="bar"><i id="semBarra"></i></div>
+      <p class="small muted" id="semMsg" style="margin:0"></p>
+    </div>
+    <div class="card fase-banner" id="faseBanner"></div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+    <p class="aviso" id="avisoFds" hidden>Hoje é fim de semana: dia de descanso. Uma caminhada leve ajuda na recuperação. Você pode adiantar ou repor um treino escolhendo o dia acima.</p>
+    <div class="head">
+      <div style="min-width:0"><div class="rot" style="justify-content:flex-start;gap:6px"><h2 id="titulo"></h2><button class="ajuda" type="button" aria-expanded="false" aria-controls="hLer" aria-label="Ajuda: como ler o treino"></button></div><p id="foco"></p></div>
+      <div class="pct" id="pct">0%</div>
+    </div>
+    <p class="ajuda-txt" id="hLer" hidden>Como ler: 4×12 quer dizer 4 séries de 12 repetições. Faça o movimento 12 vezes, descanse (use o cronômetro lá embaixo) e repita até completar 4 vezes. Quando terminar o exercício, toque no círculo. Anote o peso usado em Carga para acompanhar sua evolução.</p>
+    <div class="bar"><i id="barra"></i></div>
+    <div class="list" id="lista"></div>
+    <p class="small muted" style="text-align:center;margin:0">A animação mostra o movimento e o ponto rosa marca o músculo que mais trabalha. Toque nela para pausar.</p>
+  </section>
+
+  <!-- PROGRESSO -->
+  <section class="view" id="v-progresso" aria-label="Progresso" hidden>
+    <h2>Seu progresso</h2>
+    <div class="card">
+      <div class="rot"><h3>Últimas semanas</h3><span class="small muted" id="histLbl" style="margin-left:auto"></span><button class="ajuda" type="button" aria-expanded="false" aria-controls="hHist" aria-label="Ajuda: últimas semanas"></button></div>
+      <p class="ajuda-txt" id="hHist" hidden>Cada barra mostra quanto do treino da semana você completou, do objetivo que está escolhido agora. Verde é semana completa.</p>
+
+      <div class="hist" id="hist"></div>
+    </div>
+    <div class="card">
+      <div class="rot"><h3>Água hoje</h3><b id="aguaTxt" style="font:800 1.2rem var(--display);color:#2f7fbf;margin-left:auto">0 ml</b><button class="ajuda" type="button" aria-expanded="false" aria-controls="hAgua" aria-label="Ajuda: água"></button></div>
+      <p class="ajuda-txt" id="hAgua" hidden>Toque em um copo cada vez que beber 250 ml (um copo americano cheio). Tocou errado? Toque no último copo cheio para desmarcar. A meta usa seu peso: cerca de 35 ml por quilo.</p>
+
+      <div class="agua" id="agua"></div>
+      <p class="small muted" id="aguaMeta" style="margin:0">Cada copo é 250 ml.</p>
+    </div>
+    <div class="card">
+      <div class="rot"><h3>Evolução de carga</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hEvol" aria-label="Ajuda: evolução de carga"></button></div>
+      <p class="ajuda-txt" id="hEvol" hidden>Mostra o peso que você anotou no primeiro dia e o último, para cada exercício. Verde quer dizer que você está levantando mais peso.</p>
+
+      <p class="small muted" style="margin:0">Anote o peso em cada exercício na tela de treino. Subir a carga aos poucos é o que faz o músculo continuar evoluindo.</p>
+      <div class="scroll-x"><table class="tabela" id="cargas"></table></div>
+    </div>
+    <div class="card">
+      <div class="rot"><h3>Medidas</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hMedidas" aria-label="Ajuda: medidas"></button></div>
+      <p class="ajuda-txt" id="hMedidas" hidden>Preencha só o que quiser, não precisa das três. Meça a cada 2 semanas, sempre no mesmo horário. A tabela mostra as últimas medidas e quanto mudou.</p>
+
+      <div class="edit-aviso" id="medEditando" hidden><span id="medEditTxt"></span><button class="mini" type="button" id="medCancelar">Cancelar</button></div>
+      <form class="form" id="formMedidas" novalidate>
+        <div class="campo"><div class="rot"><label for="mPeso">Peso (kg)</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hPeso" aria-label="Ajuda: peso"></button></div><input id="mPeso" type="text" inputmode="decimal" autocomplete="off" placeholder="ex.: 62,5"></div>
+        <div class="campo"><div class="rot"><label for="mCintura">Cintura (cm)</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hCintura" aria-label="Ajuda: cintura"></button></div><input id="mCintura" type="text" inputmode="decimal" autocomplete="off" placeholder="ex.: 72"></div>
+        <div class="campo"><div class="rot"><label for="mQuadril">Quadril (cm)</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hQuadril" aria-label="Ajuda: quadril"></button></div><input id="mQuadril" type="text" inputmode="decimal" autocomplete="off" placeholder="ex.: 98"></div>
+        <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px"><p class="ajuda-txt" id="hPeso" hidden>Peso: suba na balança de manhã, depois de ir ao banheiro e antes de comer. Use vírgula para os gramas: 62,5.</p><p class="ajuda-txt" id="hCintura" hidden>Cintura: passe a fita métrica na altura do umbigo, sem apertar e sem encolher a barriga.</p><p class="ajuda-txt" id="hQuadril" hidden>Quadril: passe a fita na parte mais larga do bumbum, com os pés juntos.</p></div>
+        <button class="btn fill" type="submit" id="medSalvar" style="grid-column:1/-1">Salvar medidas de hoje</button>
+      </form>
+      <p class="small muted" id="medMsg" style="margin:0">Meça sempre no mesmo horário, de preferência de manhã. A fita métrica mostra a definição melhor que a balança.</p>
+      <div class="scroll-x"><table class="tabela" id="medidas"></table></div>
+    </div>
+  </section>
+
+  <!-- CICLO -->
+  <section class="view" id="v-ciclo" aria-label="Ciclo" hidden>
+    <div>
+      <h2>Meu mês</h2>
+      <p class="muted" style="margin:6px 0 0">O mês dividido em 4 fases do ciclo. Seu treino e sua alimentação se ajustam a cada fase, sempre com foco no seu objetivo.</p>
+    </div>
+    <div class="card" id="cicloHoje"></div>
+    <form class="card" id="formCiclo" novalidate>
+      <div><h3>Meu ciclo</h3><p class="small muted" style="margin:4px 0 0">Responda 3 perguntas rápidas. Toque no ? se tiver dúvida.</p></div>
+      <div class="campo">
+        <div class="rot"><label for="cInicio">1. Em que dia começou sua última menstruação?</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hInicio" aria-label="Ajuda: dia em que começou a menstruação"></button></div>
+        <p class="ajuda-txt" id="hInicio" hidden>É o primeiro dia em que a menstruação desceu da última vez, e não o dia em que ela acabou. Se ela começou hoje, use o botão "Minha menstruação começou hoje", lá em cima.</p>
+        <input id="cInicio" type="date" autocomplete="off">
+      </div>
+      <div class="campo">
+        <div class="rot"><label for="cDur">2. De quanto em quanto tempo ela costuma vir?</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hDur" aria-label="Ajuda: de quanto em quanto tempo vem"></button></div>
+        <p class="ajuda-txt" id="hDur" hidden>Conte do primeiro dia de uma menstruação até o primeiro dia da próxima. Exemplo: veio no dia 1 e a próxima veio no dia 29, então ela vem a cada 28 dias. Para a maioria das mulheres fica entre 24 e 35 dias. Não sabe? Deixe 28.</p>
+        <select id="cDur"></select>
+      </div>
+      <div class="campo">
+        <div class="rot"><label for="cMen">3. Quantos dias a menstruação dura?</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hMen" aria-label="Ajuda: quantos dias dura"></button></div>
+        <p class="ajuda-txt" id="hMen" hidden>Quantos dias de sangramento você costuma ter, contando o primeiro e o último. O mais comum é entre 3 e 7 dias. Não sabe? Deixe 5.</p>
+        <select id="cMen"></select>
+      </div>
+      <div class="rot"><label class="switch" for="cAjustar" style="flex:1"><span>Ajustar treino e alimentação ao meu ciclo</span><input type="checkbox" id="cAjustar" checked><i aria-hidden="true"></i></label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hAjustar" aria-label="Ajuda: ajustar ao ciclo"></button></div>
+      <p class="ajuda-txt" id="hAjustar" hidden>Ligado: o treino e o cardápio mudam um pouco em cada semana do mês, como mostra o cronograma abaixo. Desligado: o treino fica sempre igual. Isso salva na hora.</p>
+      <p class="msg-campo" id="cMsg" role="status"></p>
+      <div class="linha"><button class="btn fill" type="submit">Salvar ciclo</button><button class="btn" type="button" id="cLimpar" hidden>Apagar dados do ciclo</button></div>
+      <p class="small muted" style="margin:0">Fica salvo só neste aparelho e nunca é enviado para a IA.</p>
+    </form>
+    <div class="card">
+      <div class="rot"><h3>Cronograma do mês</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hCrono" aria-label="Ajuda: cronograma do mês"></button></div>
+      <p class="ajuda-txt" id="hCrono" hidden>O mês é dividido em 4 semanas. Semana 1 começa no primeiro dia da menstruação. Semana 2 vem depois que ela acaba, quando a energia costuma subir. Semana 3 é a ovulação, no meio do ciclo. Semana 4 é a TPM, nos dias antes da próxima menstruação. As datas seguem as suas respostas acima.</p>
+
+      <div class="semanas" id="cronograma"></div>
+    </div>
+    <p class="small muted" style="margin:0">As pesquisas mais recentes mostram que a fase do ciclo muda pouco a força e o ganho de músculo, mas muitas mulheres sentem diferença de energia, fome e disposição. Por isso o app adapta o volume e a intensidade, e você sempre pode trocar pela versão normal do treino. Ciclos muito irregulares, cólicas fortes ou falta de menstruação merecem uma consulta com a ginecologista. Se você usa anticoncepcional hormonal, as fases podem não se aplicar: use "Como você está hoje?" no treino.</p>
+  </section>
+
+  <!-- ALIMENTAÇÃO -->
+  <section class="view" id="v-alimentacao" aria-label="Alimentação" hidden>
+    <div>
+      <h2 id="alTitulo">Alimentação</h2>
+      <p class="muted" id="alResumo" style="margin:6px 0 0"></p>
+    </div>
+    <div class="card fase-banner" id="alFase" hidden></div>
+    <div class="card">
+      <div class="rot"><h3>Suas metas do dia</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hMetas" aria-label="Ajuda: metas do dia"></button></div>
+      <p class="ajuda-txt" id="hMetas" hidden>Proteína ajuda o músculo a se recuperar e dá saciedade. Para ter uma ideia: 1 ovo tem cerca de 6 g, 100 g de peito de frango cerca de 30 g, 1 concha de feijão cerca de 5 g e 1 pote de iogurte natural cerca de 6 g. Divida entre as refeições do dia.</p>
+
+      <form class="peso-linha" id="formPeso" novalidate>
+        <div class="campo" style="flex:1;min-width:150px"><div class="rot"><label for="alPeso">Seu peso (kg)</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hAlPeso" aria-label="Ajuda: seu peso"></button></div><input id="alPeso" type="text" inputmode="decimal" autocomplete="off" placeholder="ex.: 62"></div>
+        <button class="btn fill" type="submit">Calcular</button>
+      </form>
+      <p class="ajuda-txt" id="hAlPeso" hidden>Usamos seu peso só para calcular quanta proteína e água você precisa por dia. Não precisa ser exato. Se você já anotou o peso em Progresso, ele aparece aqui sozinho.</p>
+      <p class="small muted" id="alPesoMsg" style="margin:0"></p>
+      <div class="metas" id="alMetas"></div>
+    </div>
+    <div class="card">
+      <div class="rot"><h3>Monte o prato</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hPrato" aria-label="Ajuda: monte o prato"></button></div>
+      <p class="ajuda-txt" id="hPrato" hidden>Use o desenho como guia na hora de servir: divida o prato nas partes mostradas. Não precisa pesar nada.</p>
+
+      <div class="prato"><div class="disco" id="alDisco" role="img"></div><div class="legenda" id="alLegenda"></div></div>
+      <p class="small muted" id="alPratoDica" style="margin:0"></p>
+    </div>
+    <div class="card">
+      <div class="sem-top"><h3>Cardápio de hoje</h3><span class="small muted" id="alFeitas"></span></div>
+      <p class="small muted" style="margin:0">Exemplo para seguir ou adaptar. Toque em "Outra opção" para trocar a refeição e marque o que você já comeu.</p>
+      <div class="refeicoes" id="alRefeicoes"></div>
+    </div>
+    <div class="card">
+      <h3>Dia de treino</h3>
+      <ul class="lista-simples" id="alTreino"></ul>
+    </div>
+    <div class="card">
+      <h3>Para o seu objetivo</h3>
+      <ul class="lista-simples" id="alPrincipios"></ul>
+    </div>
+    <div class="card">
+      <h3>Trocas espertas</h3>
+      <div class="trocas" id="alTrocas"></div>
+    </div>
+    <p class="small muted" style="margin:0">Orientação geral, baseada no Guia Alimentar para a População Brasileira e em recomendações de nutrição esportiva. Para um plano feito pra você, procure uma nutricionista. Gestantes, lactantes e quem tem diabetes, problema nos rins ou outra condição de saúde devem seguir a orientação do médico ou da nutricionista.</p>
+  </section>
+
+  <!-- DICAS -->
+  <section class="view" id="v-dicas" aria-label="Dicas" hidden>
+    <div class="linha" style="justify-content:space-between"><h2>Dicas</h2><button class="btn" type="button" id="voltarPerfil">Voltar</button></div>
+    <div class="filtros" id="filtros"></div>
+    <div id="dicas" style="display:flex;flex-direction:column;gap:8px"></div>
+    <p class="small muted" style="margin:0">Estas dicas são gerais. Com dor, lesão, gravidez, pós-parto ou algum problema de saúde, converse com seu médico e com o professor da academia antes de treinar.</p>
+  </section>
+
+  <!-- OBJETIVO -->
+  <section class="view" id="v-objetivo" aria-label="Objetivo" hidden>
+    <div>
+      <h2 id="objTitulo">Qual é o seu objetivo?</h2>
+      <p class="muted" style="margin:6px 0 0">Escolha um e o app monta o treino da semana pra você. Dá pra trocar quando quiser.</p>
+    </div>
+    <div class="goals" id="goals"></div>
+    <p class="small muted" id="objMsg" style="margin:0"></p>
+    <button class="card" type="button" id="abrirDicas" style="text-align:left;cursor:pointer;flex-direction:row;align-items:center;justify-content:space-between">
+      <span><b style="display:block;font-size:1.02rem">Dicas</b><span class="small muted">Treino, glúteo, alimentação, ciclo, mitos e mais</span></span>
+      <span aria-hidden="true" style="font-size:1.4rem;color:var(--accent-ink)">›</span>
+    </button>
+    <div class="card" id="contaCard" hidden>
+      <div class="rot"><h3>Sua conta</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hConta" aria-label="Ajuda: sua conta"></button></div>
+      <p class="ajuda-txt" id="hConta" hidden>A conta é opcional. Sem conta, tudo fica salvo só neste celular. Com conta, seus dados ficam guardados na nuvem e voltam se você trocar de celular ou reinstalar o app. Só você tem acesso aos seus dados.</p>
+      <div id="contaFora">
+        <div class="form-conta">
+          <p class="small muted" style="margin:0">Entre para salvar seus treinos na nuvem e usar em outros aparelhos.</p>
+          <button class="btn-google" type="button" id="entrarGoogle"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Entrar com Google</button>
+          <div class="ou">ou com e-mail</div>
+          <div class="abas" role="tablist" aria-label="Acesso com e-mail">
+            <button type="button" role="tab" id="abaEntrar" aria-selected="true" aria-controls="formEntrar">Entrar</button>
+            <button type="button" role="tab" id="abaCriar" aria-selected="false" aria-controls="formCriar">Criar conta</button>
+            <button type="button" role="tab" id="abaSenha" aria-selected="false" aria-controls="formSenha">Esqueci a senha</button>
+          </div>
+          <form class="form-conta" id="formEntrar" novalidate>
+            <div class="campo"><label for="lEmail">E-mail</label><input id="lEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="erro-campo" id="lEmailErr" hidden></p></div>
+            <div class="campo"><label for="lSenha">Senha</label><div class="senha-box"><input id="lSenha" type="password" autocomplete="current-password"><button class="ver-senha" type="button" data-alvo="lSenha">Mostrar</button></div><p class="erro-campo" id="lSenhaErr" hidden></p></div>
+            <button class="btn fill" type="submit">Entrar</button>
+          </form>
+          <form class="form-conta" id="formCriar" novalidate hidden>
+            <div class="campo"><label for="cEmail">E-mail</label><input id="cEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="erro-campo" id="cEmailErr" hidden></p></div>
+            <div class="campo"><div class="rot"><label for="cSenha">Crie uma senha</label><button class="ajuda" type="button" aria-expanded="false" aria-controls="hSenha" aria-label="Ajuda: senha"></button></div><p class="ajuda-txt" id="hSenha" hidden>Use pelo menos 8 caracteres, com letras e números. Evite datas de aniversário ou senhas que você usa em outros sites.</p><div class="senha-box"><input id="cSenha" type="password" autocomplete="new-password"><button class="ver-senha" type="button" data-alvo="cSenha">Mostrar</button></div><p class="erro-campo" id="cSenhaErr" hidden></p></div>
+            <div class="campo"><label for="cSenha2">Repita a senha</label><div class="senha-box"><input id="cSenha2" type="password" autocomplete="new-password"><button class="ver-senha" type="button" data-alvo="cSenha2">Mostrar</button></div><p class="erro-campo" id="cSenha2Err" hidden></p></div>
+            <label class="switch" for="cAceite" style="font-size:.88rem;font-weight:500"><span>Li e aceito os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></span><input type="checkbox" id="cAceite"><i aria-hidden="true"></i></label>
+            <p class="erro-campo" id="cAceiteErr" hidden></p>
+            <button class="btn fill" type="submit">Criar conta</button>
+          </form>
+          <form class="form-conta" id="formSenha" novalidate hidden>
+            <p class="small muted" style="margin:0">Digite o e-mail da sua conta. Vamos enviar um link para você criar uma senha nova.</p>
+            <div class="campo"><label for="rEmail">E-mail</label><input id="rEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="erro-campo" id="rEmailErr" hidden></p></div>
+            <button class="btn fill" type="submit">Enviar link</button>
+          </form>
+        </div>
+      </div>
+      <div id="contaDentro" hidden>
+        <div class="conta-topo"><span class="avatar" id="contaAvatar" aria-hidden="true"></span><div class="quem"><b id="contaEmail"></b><span class="small muted" id="contaTipo"></span></div></div>
+        <div class="alerta" id="contaVerificar" hidden>
+          <p style="margin:0 0 8px"><b>Confirme seu e-mail.</b> Enviamos um link para <span id="contaEmail2"></span>. Abra o e-mail, toque no link e depois volte aqui. Olhe também a caixa de spam.</p>
+          <div class="linha"><button class="btn fill" type="button" id="jaConfirmei">Já confirmei</button><button class="btn" type="button" id="reenviar">Reenviar e-mail</button></div>
+        </div>
+        <div class="linha"><button class="btn" type="button" id="sair">Sair</button><button class="mini perigo" type="button" id="excluirConta">Excluir minha conta</button></div>
+        <div class="confirma" id="confirmaExcluir" hidden>
+          <p class="small" style="margin:0">Isso apaga sua conta e os dados guardados na nuvem. Os dados deste celular continuam aqui até você apagar em "Meus dados". Não dá para desfazer.</p>
+          <div class="linha"><button class="btn fill" type="button" id="simExcluir">Excluir conta</button><button class="btn" type="button" id="naoExcluir">Cancelar</button></div>
+        </div>
+      </div>
+      <p class="msg-campo" id="contaMsg" role="status"></p>
+    </div>
+    <div class="card" id="meusDados">
+      <h3>Meus dados</h3>
+      <div class="sync" id="syncStatus"><i aria-hidden="true"></i><span>Salvo neste aparelho.</span></div>
+      <div class="linha"><button class="btn" type="button" id="apagar">Apagar todos os meus dados</button></div>
+      <div class="confirma" id="confirmaApagar" hidden>
+        <p class="small" style="margin:0">Isso apaga objetivo, progresso, cargas, medidas, água e ciclo, neste aparelho e na sua conta. Não dá para desfazer.</p>
+        <div class="linha"><button class="btn fill" type="button" id="simApagar">Apagar tudo</button><button class="btn" type="button" id="naoApagar">Cancelar</button></div>
+      </div>
+      <p class="small muted" style="margin:0">Treina Ela · versão <span id="versao"></span></p>
+      <p class="copy">© 2026 WR Lui. Todos os direitos reservados. · <a href="privacidade.html" target="_blank" rel="noopener" id="linkPriv">Privacidade</a> · <a href="termos.html" target="_blank" rel="noopener" id="linkTermos">Termos de Uso</a></p>
+    </div>
+  </section>
+</div>
+
+<div class="fixo">
+  <div class="timer" id="timer">
+    <div class="t" id="tempo">1:00</div>
+    <div class="lbl">Descanso<br>entre séries</div>
+    <button class="btn" type="button" data-s="30">30s</button>
+    <button class="btn" type="button" data-s="60">60s</button>
+    <button class="btn" type="button" data-s="90">90s</button>
+    <button class="btn fill" type="button" id="iniciar">Iniciar</button>
+  </div>
+  <nav class="menu" aria-label="Menu">
+    <button type="button" data-v="treino"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Treino</button>
+    <button type="button" data-v="alimentacao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 21V3c-2.5 1.5-4 4-4 8h4"/></svg>Nutrição</button>
+    <button type="button" data-v="ciclo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2" fill="currentColor" stroke="none"/></svg>Ciclo</button>
+    <button type="button" data-v="progresso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progresso</button>
+    <button type="button" data-v="objetivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="painel" id="painelIA" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="iaTitulo">
+    <div class="sheet-top">
+      <h3 id="iaTitulo">Tire suas dúvidas</h3>
+      <button class="fechar" type="button" id="fecharIA" aria-label="Fechar">×</button>
+    </div>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <div class="sugs" id="sugs"></div>
+    <p class="small muted" id="iaStatus" style="margin:0"></p>
+    <form class="envio" id="formIA">
+      <textarea id="pergunta" placeholder="Pergunte sobre treino, execução ou alimentação" aria-label="Sua pergunta" maxlength="600"></textarea>
+      <button class="btn fill" type="submit" id="enviarIA">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ================= Animações: H cabeça, S ombro, P quadril, K/F joelho/pé, E/W cotovelo/punho; minúsculas = lado de trás ================= */
+function parse(s){const o={};s.replace(/([A-Za-z])(-?\d+),(-?\d+)/g,(_,k,x,y)=>{o[k]={x:+x,y:+y}});return o}
+function far(o){const d=a=>({x:a.x-5,y:a.y-1});[['k','K'],['f','F'],['e','E'],['w','W']].forEach(([a,b])=>{if(!o[a])o[a]=d(o[b])});return o}
+function pose(a,b,m,props,floor){const A=parse(a),B={...A,...parse(b)};return{A:far(A),B:far(B),m,props,floor:floor??126}}
+const R=(c,x,y,w,h)=>c.fillRect(x,y,w,h);
+const Ln=(c,a,b,x2,y2)=>{c.beginPath();c.moveTo(a,b);c.lineTo(x2,y2);c.stroke()};
+const Ci=(c,x,y,r)=>{c.beginPath();c.arc(x,y,r,0,7);c.fill()};
+const halter=(c,q)=>{c.save();c.lineWidth=7;Ln(c,q.x-8,q.y,q.x+8,q.y);c.restore()};
+const POSES={
+  squat:pose("H100,22 S100,38 P100,72 K104,98 F100,124 E112,50 W124,46","H116,52 S110,66 P84,90 K114,96 F102,124 E126,72 W138,68","P"),
+  thrust:pose("H54,72 S66,80 P92,112 K124,90 F142,124 E80,102 W94,106","H52,74 S66,80 P104,84 K134,86 F142,124 E84,88 W102,82","P",
+    (c,p)=>{R(c,26,82,42,44);Ci(c,p.W.x,p.W.y-6,9)}),
+  abd:pose("H100,30 S100,46 P100,88 K86,98 F86,124 k114,98 f114,124 E82,66 W78,86 e118,66 w122,86","K70,96 F74,124 k130,96 f126,124","P",
+    (c,p)=>{R(c,76,88,48,8);Ci(c,p.K.x-8,p.K.y,6);Ci(c,p.k.x+8,p.k.y,6)}),
+  kick:pose("H118,30 S112,44 P96,74 K100,98 F98,124 k92,98 f90,122 E122,58 W134,64","k70,84 f46,90","P",
+    (c,p)=>{Ln(c,24,124,p.f.x,p.f.y);R(c,136,40,8,86)}),
+  pull:pose("H100,40 S100,56 P100,94 K126,96 F126,122 E108,32 W104,10","E116,60 W108,42","S",
+    (c,p)=>{Ln(c,100,0,p.W.x,p.W.y);Ln(c,p.W.x-24,p.W.y,p.W.x+16,p.W.y);R(c,84,96,32,6)}),
+  row:pose("H92,48 S90,64 P88,100 K118,92 F140,104 E110,76 W130,80","E72,78 W96,80","S",
+    (c,p)=>{Ln(c,196,80,p.W.x,p.W.y);R(c,70,102,36,6);Ln(c,146,92,146,116)}),
+  press:pose("H100,28 S100,46 P100,90 K88,94 F88,124 k112,94 f112,124 E78,58 W76,40 e122,58 w124,40","E84,26 W86,8 e116,26 w114,8","S",
+    (c,p)=>{R(c,82,92,36,6);halter(c,p.W);halter(c,p.w)}),
+  tri:pose("H100,22 S100,40 P100,76 K102,100 F100,124 E106,64 W122,46","W110,92","E",(c,p)=>Ln(c,150,0,p.W.x,p.W.y)),
+  walk:pose("H104,22 S102,38 P100,72 K112,98 F120,122 k92,98 f82,120 E94,56 W100,72 e112,54 w124,62",
+            "K92,98 F82,120 k112,98 f120,122 E112,54 W124,62 e94,56 w100,72","P",
+    (c,p)=>{c.save();c.lineWidth=6;Ln(c,30,126,176,118);c.lineWidth=3;Ln(c,150,120,160,58);Ln(c,160,58,130,58);c.restore()},200),
+  plank:pose("H152,82 S138,92 P90,98 K62,104 F34,112 E138,112 W158,112","H152,80 P90,94","P",null,116),
+  legraise:pose("H34,106 S48,110 P96,112 K124,112 F154,112 E70,114 W88,114","K118,88 F130,58 k113,87 f125,57","P",null,120),
+  cablecrunch:pose("H98,30 S96,48 P90,88 K92,120 F62,122 E108,40 W100,30","H128,90 S118,76 E126,84 W130,96","P",(c,p)=>Ln(c,150,0,p.W.x,p.W.y),122),
+  stiff:pose("H100,22 S100,38 P100,72 K102,98 F100,124 E102,56 W102,72","H142,54 S128,58 P96,72 E126,76 W124,94","P",(c,p)=>Ci(c,p.W.x,p.W.y,9)),
+  bulg:pose("H106,24 S106,40 P100,74 K122,98 F124,124 k80,98 f54,90 E110,56 W112,72","H110,44 S108,60 P98,94 K128,104 F124,124 k80,116 f54,90 E112,76 W114,92","P",
+    (c,p)=>R(c,26,92,40,34)),
+  legpress:pose("H44,74 S56,86 P84,110 K98,76 F130,84 k93,75 f125,83 E70,104 W80,112","K118,96 F152,62 k113,95 f147,61","K",
+    (c,p)=>{c.save();c.lineWidth=4;Ln(c,30,62,94,122);c.lineWidth=7;Ln(c,p.F.x-12,p.F.y-13,p.F.x+12,p.F.y+13);c.restore()}),
+  ext:pose("H90,40 S90,56 P92,92 K120,92 F122,120 E104,80 W112,90","F150,96 f145,95","K",(c,p)=>{R(c,78,94,46,8);R(c,76,40,6,58);Ci(c,p.F.x+2,p.F.y,6)}),
+  curl:pose("H40,80 S54,86 P96,88 K126,88 F156,88 E48,104 W40,112","F134,60 f129,59","K",(c,p)=>{R(c,30,94,112,8);Ci(c,p.F.x,p.F.y-6,6)}),
+  afundo:pose("H100,22 S100,38 P100,72 K110,98 F112,124 k90,98 f86,124 E102,56 W104,72","H100,46 S100,62 P96,94 K122,98 F122,124 k80,118 f66,124 E102,78 W104,94","P",
+    (c,p)=>{halter(c,p.W)}),
+  bike:pose("H100,26 S96,42 P84,74 K108,72 F110,100 k104,92 f98,118 E112,56 W126,62","K104,92 F98,118 k108,72 f110,100","K",
+    (c,p)=>{c.save();c.lineWidth=4;Ln(c,84,78,104,112);Ln(c,104,112,124,62);Ln(c,70,124,140,124);Ln(c,74,76,92,76);c.restore();
+      c.save();c.lineWidth=3;c.beginPath();c.arc(104,110,12,0,7);c.stroke();c.restore()}),
+  supino:pose("H46,82 S60,84 P104,86 K128,82 F136,124 k124,82 f132,124 E66,98 W64,74","E64,64 W62,42","S",
+    (c,p)=>{R(c,36,90,92,8);R(c,44,98,6,28);R(c,114,98,6,28);halter(c,p.W)},126),
+  lateral:pose("H100,24 S100,40 P100,78 K92,102 F92,124 k108,102 f108,124 E90,58 W88,76 e110,58 w112,76","E76,42 W58,40 e124,42 w142,40","S",
+    (c,p)=>{halter(c,p.W);halter(c,p.w)}),
+  jack:pose("H100,26 S100,42 P100,80 K96,102 F96,124 k104,102 f104,124 E92,58 W90,76 e108,58 w110,76",
+            "H100,18 S100,34 P100,72 K86,98 F76,124 k114,98 f124,124 E84,22 W80,6 e116,22 w120,6","P"),
+  crunch:pose("H42,108 S56,112 P100,114 K120,90 F140,116 E46,100 W40,104","H64,88 S72,100 E62,88 W60,94","P",null,120),
+  flexao:pose("H150,70 S138,78 P90,90 K62,100 F34,112 E138,96 W140,114","H152,94 S140,100 P92,104 K62,108 E124,104","S",null,116),
+  calf:pose("H100,22 S100,38 P100,72 K102,98 F100,124 E102,56 W102,72","H100,14 S100,30 P100,64 K102,90 F100,118 E102,48 W102,64","F",
+    (c,p)=>R(c,84,124,40,4)),
+  rosca:pose("H100,22 S100,38 P100,72 K102,98 F100,124 E102,58 W104,78","W114,42","E",(c,p)=>halter(c,p.W)),
+  sideplank:pose("H152,78 S138,88 P92,102 K60,108 F30,114 k60,106 f30,112 E138,112 W156,114 e140,72 w142,56","P92,94 K60,104","P",null,118),
+  superman:pose("H140,108 S126,112 P84,114 K58,114 F30,114 E150,114 W170,114","H144,100 S126,108 K58,110 F28,98 E150,102 W172,92","P",null,118),
+  bandwalk:pose("H100,28 S100,44 P100,82 K88,104 F90,124 k112,104 f110,124 E90,64 W92,80 e110,64 w108,80","K72,104 F66,124 k116,104 f114,124","P",
+    (c,p)=>{c.save();c.lineWidth=4;Ln(c,p.K.x,p.K.y-8,p.k.x,p.k.y-8);c.restore()})
+};
+const SEM_CARGA=new Set(["walk","bike","plank","sideplank","jack","superman","legraise","crunch","flexao","bandwalk"]);
+
+/* ================= Treinos por objetivo ================= */
+const OBJ={
+ gluteo:{n:"Glúteo e pernas",ic:"GL",d:"Bumbum mais redondo e firme, pernas definidas.",nivel:"Intermediário",descanso:60,
+  dica:"Foque na contração do glúteo e suba a carga devagar a cada semana.",
+  dias:{
+  Seg:{t:"Glúteo A",f:"Foco em glúteo máximo",ex:[
+    ["Elevação pélvica","4×12","Suba contraindo o bumbum e segure 1s no topo.","thrust"],
+    ["Agachamento sumô","4×12","Pés afastados, pontas para fora, desça até 90°.","squat"],
+    ["Cadeira abdutora","3×15","Incline o tronco à frente para pegar mais glúteo.","abd"],
+    ["Coice no cabo","3×12 cada perna","Perna estendida para trás, sem arquear a lombar.","kick"]]},
+  Ter:{t:"Parte de cima",f:"Costas, ombro e braço",ex:[
+    ["Puxada frontal","3×12","Puxe a barra até o peito, cotovelos para baixo.","pull"],
+    ["Remada baixa","3×12","Peito aberto, puxe até a barriga.","row"],
+    ["Desenvolvimento com halteres","3×12","Empurre para cima sem travar os cotovelos.","press"],
+    ["Tríceps na corda","3×12","Cotovelos colados no corpo, abra a corda embaixo.","tri"]]},
+  Qua:{t:"Cardio + Abdômen",f:"Queima e core",ex:[
+    ["Esteira inclinada caminhando","30 min","Inclinação de 8 a 12%, num ritmo que dá pra conversar.","walk"],
+    ["Prancha","3×40s","Corpo reto, contraia abdômen e bumbum.","plank"],
+    ["Abdominal infra","3×15","Suba as pernas devagar, sem balançar.","legraise"],
+    ["Abdominal na polia","3×15","Ajoelhada de frente pro cabo, corda atrás da cabeça. Enrole o tronco levando os cotovelos aos joelhos.","cablecrunch"]]},
+  Qui:{t:"Glúteo B",f:"Posterior e glúteo",ex:[
+    ["Stiff","4×12","Desça com a coluna reta, sinta alongar atrás da coxa.","stiff"],
+    ["Agachamento búlgaro","3×10 cada perna","Pé de trás no banco, tronco levemente à frente.","bulg"],
+    ["Glúteo na máquina","3×12","Empurre com o calcanhar e segure no final.","kick"],
+    ["Cadeira abdutora","3×20","Última série até cansar bem.","abd"]]},
+  Sex:{t:"Perna completa",f:"Quadríceps, posterior e glúteo",ex:[
+    ["Agachamento livre","4×12","Joelhos na direção dos pés, desça com controle.","squat"],
+    ["Leg press pés altos","4×12","Pés no alto da plataforma puxam mais glúteo.","legpress"],
+    ["Cadeira extensora","3×12","Segure 1s com a perna esticada.","ext"],
+    ["Mesa flexora","3×12","Desça devagar, sem tirar o quadril do banco.","curl"]]}}},
+ secar:{n:"Emagrecer e secar",ic:"EM",d:"Perder gordura mantendo os músculos, com mais cardio.",nivel:"Todos os níveis",descanso:30,
+  dica:"Descanso curto entre séries deixa o treino mais intenso. A alimentação faz grande parte do resultado.",
+  dias:{
+  Seg:{t:"Pernas em circuito",f:"Pouco descanso entre exercícios",ex:[
+    ["Agachamento livre","3×15","Ritmo constante, sem pausa lá embaixo.","squat"],
+    ["Afundo andando","3×12 cada perna","Passo largo, joelho de trás quase toca o chão.","afundo"],
+    ["Leg press","3×15","Desça até 90° nos joelhos e empurre com o pé inteiro.","legpress"],
+    ["Bicicleta intervalada","12 min","30s forte e 60s leve, repetindo.","bike"]]},
+  Ter:{t:"Superiores + cardio",f:"Costas, peito, ombro e esteira",ex:[
+    ["Puxada frontal","3×15","Puxe até o peito sem jogar o corpo para trás.","pull"],
+    ["Supino com halteres","3×12","Desça os halteres até a altura do peito.","supino"],
+    ["Remada baixa","3×15","Aperte as escápulas no final do movimento.","row"],
+    ["Elevação lateral","3×15","Suba até a altura dos ombros, cotovelos levemente dobrados.","lateral"],
+    ["Esteira inclinada","20 min","Caminhada rápida com inclinação.","walk"]]},
+  Qua:{t:"Cardio + core",f:"Gasto calórico e abdômen",ex:[
+    ["Polichinelo","4×40s","Aterrisse suave na ponta dos pés.","jack"],
+    ["Bicicleta","20 min","Ritmo moderado, dá pra falar mas não cantar.","bike"],
+    ["Prancha","3×40s","Quadril alinhado, sem deixar a lombar cair.","plank"],
+    ["Abdominal supra","3×20","Tire só os ombros do chão, sem puxar o pescoço.","crunch"]]},
+  Qui:{t:"Glúteo e posterior",f:"Glúteo, posterior e escada",ex:[
+    ["Elevação pélvica","4×15","Segure 1s no topo apertando o bumbum.","thrust"],
+    ["Stiff","3×12","Coluna reta, desça até sentir alongar.","stiff"],
+    ["Cadeira abdutora","3×20","Movimento controlado na volta.","abd"],
+    ["Mesa flexora","3×15","Sem tirar o quadril do banco.","curl"],
+    ["Escada ou elíptico","15 min","Ritmo moderado e constante.","walk"]]},
+  Sex:{t:"Corpo todo em circuito",f:"Um exercício atrás do outro",ex:[
+    ["Agachamento com halter","3×15","Segure o halter junto ao peito.","squat"],
+    ["Flexão","3×10","Pode apoiar os joelhos no chão.","flexao"],
+    ["Remada baixa","3×15","Peito aberto, ombros para trás.","row"],
+    ["Afundo","3×12 cada perna","Tronco reto, desça devagar.","afundo"],
+    ["Esteira","15 min","Caminhada rápida ou trote leve.","walk"]]}}},
+ definir:{n:"Definir o corpo",ic:"DF",d:"Corpo todo firme e com contorno, treinando tudo na semana.",nivel:"Intermediário",descanso:60,
+  dica:"Para definir, treine pesado o bastante e mantenha uma alimentação com boa proteína.",
+  dias:{
+  Seg:{t:"Pernas",f:"Quadríceps e panturrilha",ex:[
+    ["Agachamento livre","4×12","Desça até onde mantém a coluna reta.","squat"],
+    ["Leg press","3×12","Não tire o quadril do banco.","legpress"],
+    ["Cadeira extensora","3×15","Segure 1s com a perna esticada.","ext"],
+    ["Panturrilha em pé","3×20","Suba até a ponta dos pés e desça devagar.","calf"]]},
+  Ter:{t:"Costas e bíceps",f:"Costas firmes e postura",ex:[
+    ["Puxada frontal","4×12","Cotovelos apontando para baixo.","pull"],
+    ["Remada baixa","3×12","Aperte as escápulas.","row"],
+    ["Face pull na polia","3×15","Puxe a corda na altura do rosto, abrindo os cotovelos.","row"],
+    ["Rosca direta","3×12","Cotovelos parados ao lado do corpo.","rosca"]]},
+  Qua:{t:"Glúteo + abdômen",f:"Bumbum e cintura",ex:[
+    ["Elevação pélvica","4×12","Segure 1s no topo.","thrust"],
+    ["Coice no cabo","3×12 cada perna","Sem arquear a lombar.","kick"],
+    ["Abdominal na polia","3×15","Enrole o tronco, não puxe com os braços.","cablecrunch"],
+    ["Prancha lateral","3×30s cada lado","Quadril alto, corpo em linha reta.","sideplank"]]},
+  Qui:{t:"Peito, ombro e tríceps",f:"Braços e ombros definidos",ex:[
+    ["Supino com halteres","4×10","Desça devagar até a altura do peito.","supino"],
+    ["Desenvolvimento com halteres","3×12","Sem travar os cotovelos lá em cima.","press"],
+    ["Elevação lateral","3×15","Suba até a altura dos ombros.","lateral"],
+    ["Tríceps na corda","3×12","Abra a corda no final.","tri"]]},
+  Sex:{t:"Posterior + cardio",f:"Posterior, glúteo e HIIT",ex:[
+    ["Stiff","4×10","Coluna reta o tempo todo.","stiff"],
+    ["Mesa flexora","3×12","Desça devagar.","curl"],
+    ["Cadeira abdutora","3×15","Tronco inclinado à frente.","abd"],
+    ["Bicicleta intervalada","15 min","30s forte e 60s leve.","bike"]]}}},
+ massa:{n:"Ganhar massa",ic:"MS",d:"Mais músculo e curvas, com cargas mais pesadas.",nivel:"Intermediário a avançado",descanso:90,
+  dica:"Menos repetições com mais carga e descanso maior. Comer o suficiente é essencial pra crescer.",
+  dias:{
+  Seg:{t:"Glúteo e quadríceps",f:"Dia pesado de pernas",ex:[
+    ["Agachamento livre","4×8","Carga desafiadora, técnica perfeita.","squat"],
+    ["Elevação pélvica","4×8","Pesado, com pausa de 1s no topo.","thrust"],
+    ["Leg press","3×10","Amplitude completa.","legpress"],
+    ["Cadeira extensora","3×12","Última série até a falha.","ext"]]},
+  Ter:{t:"Costas e ombro",f:"Parte de cima",ex:[
+    ["Puxada frontal","4×8","Controle a volta da barra.","pull"],
+    ["Remada baixa","4×10","Puxe com as costas, não com os braços.","row"],
+    ["Desenvolvimento com halteres","3×10","Tronco firme, sem arquear.","press"],
+    ["Elevação lateral","3×12","Movimento lento.","lateral"]]},
+  Qua:{t:"Descanso ativo",f:"Recuperação e core",ex:[
+    ["Esteira caminhando","25 min","Ritmo leve, só pra circular.","walk"],
+    ["Prancha","3×45s","Respire normalmente.","plank"],
+    ["Abdominal infra","3×15","Sem balançar.","legraise"]]},
+  Qui:{t:"Posterior e glúteo",f:"Dia pesado de posterior",ex:[
+    ["Stiff","4×8","Pesado, coluna sempre reta.","stiff"],
+    ["Agachamento búlgaro","3×10 cada perna","Tronco à frente para pegar mais glúteo.","bulg"],
+    ["Mesa flexora","3×10","Controle a descida.","curl"],
+    ["Cadeira abdutora","3×15","Segure 1s aberta.","abd"]]},
+  Sex:{t:"Superiores",f:"Peito e braços",ex:[
+    ["Supino com halteres","4×10","Desça devagar.","supino"],
+    ["Remada baixa","3×10","Peito aberto.","row"],
+    ["Rosca direta","3×12","Sem balançar o corpo.","rosca"],
+    ["Tríceps na corda","3×12","Cotovelos parados.","tri"]]}}},
+ iniciante:{n:"Começando agora",ic:"IN",d:"Primeiros meses de academia, aprendendo os movimentos com segurança.",nivel:"Iniciante",descanso:60,
+  dica:"Nas primeiras semanas, use carga leve e foque em aprender o movimento. Peça ajuda ao professor pra ajustar os aparelhos.",
+  dias:{
+  Seg:{t:"Corpo todo A",f:"Máquinas, carga leve",ex:[
+    ["Leg press","2×12","Ajuste o banco para os joelhos fazerem 90°.","legpress"],
+    ["Puxada frontal","2×12","Puxe até o peito.","pull"],
+    ["Cadeira extensora","2×12","Movimento lento.","ext"],
+    ["Desenvolvimento com halteres","2×12","Halteres leves.","press"],
+    ["Prancha","2×20s","Pode apoiar os joelhos no chão.","plank"]]},
+  Ter:{t:"Caminhada",f:"Cardio leve",ex:[
+    ["Esteira caminhando","30 min","Ritmo confortável, aumente aos poucos.","walk"],
+    ["Elevação pélvica sem peso","2×15","Só o peso do corpo, segure 1s no topo.","thrust"]]},
+  Qua:{t:"Corpo todo B",f:"Máquinas, carga leve",ex:[
+    ["Agachamento com apoio","2×12","Sente e levante de um banco, sem soltar o corpo.","squat"],
+    ["Remada baixa","2×12","Ombros para trás.","row"],
+    ["Mesa flexora","2×12","Movimento controlado.","curl"],
+    ["Supino com halteres","2×12","Halteres leves.","supino"],
+    ["Abdominal supra","2×12","Tire só os ombros do chão.","crunch"]]},
+  Qui:{t:"Bike leve",f:"Cardio leve",ex:[
+    ["Bicicleta","25 min","Ritmo leve.","bike"],
+    ["Prancha","2×20s","Corpo em linha reta.","plank"]]},
+  Sex:{t:"Corpo todo C",f:"Glúteo e parte de cima",ex:[
+    ["Elevação pélvica","2×12","Comece só com a barra ou um anilha leve.","thrust"],
+    ["Cadeira abdutora","2×15","Tronco reto.","abd"],
+    ["Puxada frontal","2×12","Cotovelos para baixo.","pull"],
+    ["Elevação lateral","2×12","Halteres bem leves.","lateral"],
+    ["Panturrilha em pé","2×15","Suba devagar.","calf"]]}}},
+ postura:{n:"Força e postura",ic:"PO",d:"Costas fortes, core firme e mais disposição no dia a dia.",nivel:"Todos os níveis",descanso:60,
+  dica:"Ótimo pra quem passa o dia sentada. Fortalecer costas e abdômen ajuda a ficar mais ereta.",
+  dias:{
+  Seg:{t:"Costas e core",f:"Postura",ex:[
+    ["Puxada frontal","3×12","Peito aberto.","pull"],
+    ["Remada baixa","3×12","Aperte as escápulas.","row"],
+    ["Face pull na polia","3×15","Puxe na altura do rosto.","row"],
+    ["Superman","3×12","Levante braços e pernas juntos, segure 2s.","superman"]]},
+  Ter:{t:"Pernas",f:"Base forte",ex:[
+    ["Agachamento livre","3×12","Coluna neutra.","squat"],
+    ["Stiff leve","3×12","Carga leve, coluna reta.","stiff"],
+    ["Elevação pélvica","3×12","Segure no topo.","thrust"],
+    ["Panturrilha em pé","3×15","Devagar.","calf"]]},
+  Qua:{t:"Core",f:"Abdômen e estabilidade",ex:[
+    ["Prancha","3×30s","Contraia abdômen e bumbum.","plank"],
+    ["Prancha lateral","3×20s cada lado","Quadril alto.","sideplank"],
+    ["Caminhada lateral com elástico","3×15 passos cada lado","Joelhos para fora, passos curtos.","bandwalk"],
+    ["Abdominal infra","3×12","Lombar colada no chão.","legraise"]]},
+  Qui:{t:"Superiores",f:"Ombros e peito",ex:[
+    ["Supino com halteres","3×12","Ombros encaixados.","supino"],
+    ["Desenvolvimento com halteres","3×10","Sem arquear a lombar.","press"],
+    ["Remada baixa","3×12","Ombros para trás.","row"],
+    ["Flexão","3×8","Com apoio dos joelhos se precisar.","flexao"]]},
+  Sex:{t:"Cardio + pernas",f:"Disposição",ex:[
+    ["Bicicleta","20 min","Ritmo moderado.","bike"],
+    ["Agachamento búlgaro","3×10 cada perna","Use apoio se precisar de equilíbrio.","bulg"],
+    ["Prancha","3×30s","Respire normalmente.","plank"]]}}}
+};
+const GOALS=Object.keys(OBJ);
+const DIAS=["Seg","Ter","Qua","Qui","Sex"];
+const SEMANA_NOMES=["Dom","Seg","Ter","Qua","Qui","Sex","Sab"];
+
+/* ================= Dicas ================= */
+const DICAS=[
+ ["Treino","Como evoluir de verdade",[
+  "Subir a carga aos poucos é o que mais faz o músculo crescer. Quando conseguir fazer todas as repetições com facilidade, aumente de 1 a 2 kg.",
+  "Termine cada série sentindo que conseguiria fazer só mais 1 ou 2 repetições.",
+  "Anote a carga de cada exercício no app. Assim você sabe quando subir.",
+  "Constância vale mais que intensidade: 3 a 5 treinos por semana, todas as semanas."]],
+ ["Treino","Execução e segurança",[
+  "Aqueça 5 a 10 minutos antes (bike, esteira ou uma série leve do primeiro exercício).",
+  "Ajuste o aparelho ao seu corpo: banco, encosto e apoio dos pés. Peça ajuda ao professor.",
+  "Solte o ar na parte de esforço e puxe o ar na volta. Não prenda a respiração.",
+  "Dor aguda ou fisgada não é normal. Pare o exercício e procure orientação."]],
+ ["Glúteo","Bumbum mais redondo",[
+  "Elevação pélvica, agachamento, stiff e abdução são a base para glúteo.",
+  "Pense em apertar o bumbum em cada repetição e segure 1 segundo na contração.",
+  "Treine glúteo 2 a 3 vezes por semana, com pelo menos um dia de descanso entre os treinos.",
+  "Glúteo responde bem a carga pesada e também a repetições mais altas. Varie."]],
+ ["Alimentação","Comer para o seu objetivo",[
+  "Proteína em todas as refeições ajuda a manter e ganhar músculo (ovos, frango, peixe, iogurte, feijão).",
+  "Para secar, um déficit moderado funciona melhor que dietas muito restritivas.",
+  "Para ganhar massa, você precisa comer o suficiente. Treinar sem comer não dá resultado.",
+  "Uma nutricionista pode montar o plano certo pra você."]],
+ ["Alimentação","Antes e depois do treino",[
+  "Antes: algo leve 1 a 2 horas antes, como banana com aveia, pão com ovo ou iogurte com fruta.",
+  "Depois: uma refeição com proteína e carboidrato, como arroz, feijão e frango.",
+  "Beba água ao longo do dia, não só durante o treino."]],
+ ["Corpo feminino","Ciclo menstrual e treino",[
+  "As pesquisas mais recentes mostram que a fase do ciclo não muda muito a força nem o ganho de músculo.",
+  "Treinar menstruada é seguro. Se estiver com cólica ou muito cansada, diminua a carga ou faça algo mais leve.",
+  "Use a tela Ciclo e o \"Como você está hoje?\" do treino para o app ajustar o treino ao que você sente.",
+  "Ciclos muito irregulares ou ausência de menstruação merecem uma conversa com o ginecologista."]],
+ ["Corpo feminino","Mitos comuns",[
+  "Musculação não deixa a mulher masculinizada. Ganhar muito volume leva anos de treino e comida.",
+  "Não existe queima de gordura só em um lugar. Abdominal fortalece, mas quem seca a barriga é o conjunto treino e alimentação.",
+  "Treinar pesado não é perigoso quando a técnica está correta.",
+  "Cardio sozinho não define. A musculação é que dá forma ao corpo."]],
+ ["Recuperação","Descanso também é treino",[
+  "Durma de 7 a 9 horas. É no descanso que o músculo se recupera.",
+  "Dor muscular leve 1 a 2 dias depois é normal. Dor forte ou nas articulações não é.",
+  "Alongamento leve e caminhada nos dias de folga ajudam a recuperar."]],
+ ["Academia","Primeira vez na academia",[
+  "Peça ao professor para te mostrar cada aparelho na primeira semana.",
+  "Leve garrafinha, toalha e fone. Ajuda a se concentrar.",
+  "Todo mundo começou do zero. Foque no seu treino e na sua evolução."]]
+];
+
+/* ================= Estado salvo no aparelho ================= */
+const KEY="meutreino:v2";
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+function semanaId(dt=new Date()){const s=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());s.setDate(s.getDate()-((s.getDay()+6)%7));return iso(s)}
+const fmtN=n=>String(n).replace(".",",");
+const lerNum=t=>{t=String(t).trim().replace(/\s/g,"").replace(",",".");return /^\d+(\.\d+)?$/.test(t)?Number(t):null};
+const num=(v,min,max)=>{v=Number(v);return Number.isFinite(v)&&v>=min&&v<=max?Math.round(v*10)/10:null};
+const isDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
+let salvaOk=true;
+const CICLO0=()=>({inicio:"",dur:28,menst:5,ajustar:true});
+let S={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0};
+
+function limpar(o){
+  const n={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0};
+  if(!o||typeof o!=="object"||Array.isArray(o))return n;
+  if(GOALS.includes(o.goal))n.goal=o.goal;
+  if(o.semanas&&typeof o.semanas==="object")for(const k in o.semanas){
+    const m=/^([a-z]+)\|(\d{4}-\d{2}-\d{2})$/.exec(k);if(!m||!OBJ[m[1]])continue;
+    const d=o.semanas[k],c={};if(d&&typeof d==="object")for(const x in d){if(/^(Seg|Ter|Qua|Qui|Sex)-\d$/.test(x)&&d[x]===1)c[x]=1}
+    n.semanas[k]=c}
+  if(o.cargas&&typeof o.cargas==="object")for(const k in o.cargas){
+    if(typeof k!=="string"||k.length>60)continue;const h=o.cargas[k];if(!Array.isArray(h))continue;
+    const hh=h.filter(e=>Array.isArray(e)&&isDate(e[0])&&num(e[1],0,500)!==null).map(e=>[e[0],num(e[1],0,500)]).slice(-30);
+    if(hh.length)n.cargas[k]=hh}
+  if(Array.isArray(o.medidas))n.medidas=o.medidas.filter(m=>m&&isDate(m.d)).map(m=>({d:m.d,peso:num(m.peso,20,300),cintura:num(m.cintura,30,250),quadril:num(m.quadril,30,250)})).slice(-60);
+  if(o.agua&&typeof o.agua==="object")for(const k in o.agua){const v=num(o.agua[k],0,16);if(isDate(k)&&v!==null)n.agua[k]=v}
+  if(o.ciclo&&typeof o.ciclo==="object"&&!Array.isArray(o.ciclo)){
+    n.ciclo.inicio=isDate(o.ciclo.inicio)&&o.ciclo.inicio>"1999"?o.ciclo.inicio:"";
+    const d=num(o.ciclo.dur,21,45);n.ciclo.dur=d===null?28:Math.round(d);
+    const m=num(o.ciclo.menst,2,10);n.ciclo.menst=m===null?5:Math.round(m);
+    n.ciclo.ajustar=o.ciclo.ajustar!==false}
+  if(o.sintomas&&typeof o.sintomas==="object")for(const k in o.sintomas){if(isDate(k)&&SINTOMAS.some(x=>x[0]===o.sintomas[k]))n.sintomas[k]=o.sintomas[k]}
+  if(o.normal&&typeof o.normal==="object")for(const k in o.normal){if(isDate(k)&&o.normal[k]===1)n.normal[k]=1}
+  n.peso=num(o.peso,30,300);
+  n.atualizado=num(o.atualizado,0,1e15)||0;
+  n.medidas.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
+  // peso único: o peso da Nutrição vira uma medida
+  if(n.peso!==null){if(!n.medidas.some(m=>m.peso!==null)){const d=iso(new Date());const i=n.medidas.findIndex(m=>m.d===d);
+    if(i>=0)n.medidas[i].peso=n.peso;else n.medidas.push({d,peso:n.peso,cintura:null,quadril:null})}n.peso=null}
+  if(o.refeicoes&&typeof o.refeicoes==="object")for(const k in o.refeicoes){
+    const r=o.refeicoes[k];if(!isDate(k)||!r||typeof r!=="object"||Array.isArray(r))continue;
+    const c={};for(const x in r){if(/^[0-5]$/.test(x)&&Number.isInteger(r[x])&&r[x]>=0&&r[x]<=9)c[x]=r[x]}
+    n.refeicoes[k]=c}
+  return n;
+}
+function carregar(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    S=limpar(raw?JSON.parse(raw):null);
+    // traz o progresso da versão anterior (só glúteo)
+    for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);
+      if(k&&k.startsWith("treino:")){
+        try{const w=k.slice(7),o=JSON.parse(localStorage.getItem(k));if(isDate(w)&&o&&typeof o==="object"){
+          const c=S.semanas["gluteo|"+w]||{};for(const x in o)if(/^(Seg|Ter|Qua|Qui|Sex)-\d$/.test(x)&&o[x]===1)c[x]=1;S.semanas["gluteo|"+w]=c;if(!S.goal)S.goal="gluteo"}}catch(e){}
+        localStorage.removeItem(k)}
+      else if(k&&k.startsWith("treino-"))localStorage.removeItem(k)}
+    // guarda só as últimas 12 semanas
+    const lim=new Date();lim.setDate(lim.getDate()-7*12);const corte=semanaId(lim);
+    for(const k in S.semanas)if(k.split("|")[1]<corte)delete S.semanas[k];
+    for(const k in S.agua)if(k<iso(lim))delete S.agua[k];
+    const lim2=new Date();lim2.setDate(lim2.getDate()-14);for(const k in S.refeicoes)if(k<iso(lim2))delete S.refeicoes[k];
+    for(const k in S.sintomas)if(k<iso(lim2))delete S.sintomas[k];for(const k in S.normal)if(k<iso(lim2))delete S.normal[k];
+    gravarLocal();
+  }catch(e){salvaOk=false}
+}
+function gravarLocal(){try{localStorage.setItem(KEY,JSON.stringify(S));salvaOk=true}catch(e){salvaOk=false}}
+function salvar(aviso){
+  S.atualizado=Date.now();gravarLocal();agendarNuvem();
+  if(aviso)toast(salvaOk||nuvem.estado==="conta"?aviso:"Não foi possível salvar neste aparelho. Saia da aba anônima.",!(salvaOk||nuvem.estado==="conta"));
+}
+let toastT=null;
+function toast(txt,erro){const t=document.getElementById("toast");t.textContent=txt;t.className="toast"+(erro?" erro":"");t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},erro?4000:1800)}
+
+/* ================= Salvar na conta (db) ================= */
+const nuvem={ref:null,tipo:null,estado:"local",escrevendo:false,pendente:false,timer:null,tentou:false};
+function statusNuvem(){
+  const box=document.getElementById("syncStatus");if(!box)return;
+  const map={local:["",CONTA.disponivel()?"Salvo neste aparelho. Entre na sua conta (acima) para salvar também na nuvem.":"Salvo neste aparelho."],
+    conectando:["","Conectando à sua conta…"],
+    conta:["ok",nuvem.tipo==="firebase"?"Salvo na sua conta Treina Ela: seus dados voltam se você trocar de celular ou reinstalar o app. Só você vê os seus dados.":"Salvo na sua conta Claude: seus dados voltam mesmo se você fechar o app ou trocar de celular. Só você vê os seus dados."],
+    semPermissao:["aviso","Salvo só neste aparelho. Para salvar na conta, peça para quem compartilhou o app te dar acesso de Colaboradora."],
+    erro:["aviso","Salvo neste aparelho. A conta não respondeu agora; o app tenta de novo sozinho."]};
+  const [c,t]=map[nuvem.estado]||map.local;box.className="sync "+c;box.querySelector("span").textContent=t;
+}
+function agendarNuvem(){if(!nuvem.ref||nuvem.estado==="semPermissao")return;clearTimeout(nuvem.timer);nuvem.timer=setTimeout(enviarNuvem,800)}
+async function enviarNuvem(){
+  if(!nuvem.ref)return;
+  if(nuvem.escrevendo){nuvem.pendente=true;return}
+  nuvem.escrevendo=true;nuvem.pendente=false;
+  try{await nuvem.ref.set({v:1,atualizado:S.atualizado,s:JSON.stringify(S)});nuvem.estado="conta";nuvem.tentou=false}
+  catch(e){const c=e&&e.code;
+    if(c==="invalid_argument"||c==="permission-denied")nuvem.estado="semPermissao";
+    else if(c==="revoked"||c==="not_granted"||c==="capability_disabled"||c==="capability_removed"){nuvem.estado="local";nuvem.ref=null}
+    else{nuvem.estado="erro";if(!nuvem.tentou){nuvem.tentou=true;setTimeout(enviarNuvem,1500+Math.random()*1500)}}}
+  finally{nuvem.escrevendo=false;statusNuvem();if(nuvem.pendente)enviarNuvem()}
+}
+async function puxarNuvem(){
+  if(!nuvem.ref)return;
+  try{
+    const snap=await Promise.race([nuvem.ref.get(),new Promise((_,r)=>setTimeout(()=>r({code:"unavailable"}),10000))]);
+    const d=snap.exists?snap.data():null;
+    let remoto=null;try{remoto=d&&typeof d.s==="string"?limpar(JSON.parse(d.s)):null}catch(e){remoto=null}
+    if(remoto&&remoto.atualizado>S.atualizado){const semObjetivo=!S.goal;S=remoto;gravarLocal();nuvem.estado="conta";definirDescanso();ir(!S.goal?"objetivo":semObjetivo?"treino":tela)}
+    else if(!remoto||remoto.atualizado<S.atualizado){if(S.atualizado||S.goal){await enviarNuvem()}else nuvem.estado="conta"}
+    else nuvem.estado="conta";
+  }catch(e){nuvem.estado=e&&e.code==="unavailable"?"erro":"local"}
+  statusNuvem();
+}
+async function iniciarNuvem(){
+  try{
+    if(!window.claude||!window.claude.use){statusNuvem();CONTA.iniciar();return}
+    nuvem.estado="conectando";statusNuvem();
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    const id=user?await user.id():null;
+    if(!db||!id){nuvem.estado="local";statusNuvem();return}
+    nuvem.ref=db.doc("data/users/"+id+"/estado");nuvem.tipo="claude";
+    await puxarNuvem();
+  }catch(e){nuvem.estado="local";nuvem.ref=null;statusNuvem()}
+}
+
+/* ================= Navegação ================= */
+let tela="treino";
+const navBtns=[...document.querySelectorAll("nav.menu button")];
+function ir(v){
+  tela=v;
+  for(const id of ["treino","progresso","alimentacao","ciclo","dicas","objetivo"])document.getElementById("v-"+id).hidden=id!==v;
+  document.getElementById("subObjetivo").textContent=S.goal?OBJ[S.goal].n:"Escolha seu objetivo";
+  const ativo=v==="dicas"?"objetivo":v;
+  navBtns.forEach(b=>b.dataset.v===ativo?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  document.getElementById("timer").hidden=v!=="treino";
+  document.body.classList.toggle("sem-timer",v!=="treino");
+  if(v==="treino")renderTreino();
+  if(v==="progresso")renderProgresso();
+  if(v==="dicas")renderDicas();
+  if(v==="alimentacao")renderAlimentacao();
+  if(v==="ciclo")renderCiclo(true);
+  if(v==="objetivo")renderObjetivos();
+  window.scrollTo({top:0});
+}
+navBtns.forEach(b=>b.onclick=()=>ir(b.dataset.v));
+
+/* ================= Tela Treino ================= */
+let semana=semanaId();
+let hoje=SEMANA_NOMES[new Date().getDay()];
+let atual=DIAS.includes(hoje)?hoje:"Seg";
+const P=()=>OBJ[S.goal||"gluteo"];
+const chaveSemana=()=>(S.goal||"gluteo")+"|"+semana;
+const dadosSemana=()=>S.semanas[chaveSemana()]||{};
+const get=k=>dadosSemana()[k]===1;
+function set(k,v){const d={...dadosSemana()};if(v)d[k]=1;else delete d[k];S.semanas[chaveSemana()]=d;salvar()}
+const totalSemana=()=>DIAS.reduce((n,d)=>n+P().dias[d].ex.length,0);
+const feitosDia=d=>P().dias[d].ex.filter((_,i)=>get(d+"-"+i)).length;
+
+const tabs=document.getElementById("tabs");
+DIAS.forEach(d=>{const b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.id="tab-"+d;
+  b.onclick=()=>{atual=d;renderTreino()};tabs.appendChild(b)});
+
+let demos=[];
+const obs=("IntersectionObserver" in window)?new IntersectionObserver(es=>es.forEach(e=>{const d=demos.find(x=>x.cv===e.target);if(d)d.vis=e.isIntersecting}),{rootMargin:"100px"}):null;
+const reduz=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function ultimaCarga(n){const h=S.cargas[n];return h&&h.length?h[h.length-1][1]:null}
+function gravarCarga(n,v){
+  v=num(v,0,500);if(v===null)return;
+  const h=S.cargas[n]||[],d=iso(new Date());
+  if(h.length&&h[h.length-1][0]===d)h[h.length-1][1]=v;else h.push([d,v]);
+  S.cargas[n]=h.slice(-30);salvar();
+}
+
+function renderTreino(){
+  const G=P(),D=G.dias[atual],modo=modoHoje(),EX=transformar(D.ex,modo.k);
+  document.getElementById("subObjetivo").textContent=G.n;
+  renderBanner(modo);
+  tabs.querySelectorAll("button").forEach(b=>{const d=b.id.slice(4),ok=feitosDia(d)===G.dias[d].ex.length;
+    b.setAttribute("aria-selected",d===atual);b.classList.toggle("ok",ok);
+    b.innerHTML=d+(d===hoje?'<span class="hoje">hoje</span>':'');b.setAttribute("aria-label",d+(ok?", concluído":""))});
+  document.getElementById("avisoFds").hidden=DIAS.includes(hoje);
+  document.getElementById("titulo").textContent=D.t;
+  document.getElementById("foco").textContent=D.f;
+  const lista=document.getElementById("lista");if(obs)obs.disconnect();lista.innerHTML="";demos=[];
+  let feitos=0;
+  EX.forEach(([n,s,dica,pz,mod],i)=>{
+    const k=atual+"-"+i,ok=get(k);if(ok)feitos++;
+    const el=document.createElement("article");el.className="ex"+(ok?" done":"");
+    const q=encodeURIComponent(n+" como fazer academia");
+    el.innerHTML=`<div class="ex-top"><button class="chk" type="button" aria-pressed="${ok}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+      <div class="tit"><p class="nome"></p><span class="tag"></span></div></div>
+      <canvas class="demo" tabindex="0" role="img"></canvas>
+      <p class="dica"></p>
+      <div class="carga" hidden><label>Carga</label><div class="step"><button type="button" aria-label="Diminuir carga">−</button><input type="text" inputmode="decimal" autocomplete="off" placeholder="0"><button type="button" aria-label="Aumentar carga">+</button></div><span>kg</span><span class="muted"></span></div>
+      <div class="linha"><a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/results?search_query=${q}">Ver vídeo</a>
+      <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(n+' gif academia')}">Mais GIFs</a></div>`;
+    el.querySelector(".nome").textContent=n;el.querySelector(".tag").textContent=s;el.querySelector(".dica").textContent=dica;
+    {const m=/^(\d+)×(\d+)(s?)(.*)$/.exec(s);if(m)el.querySelector(".tag").setAttribute("aria-label",m[1]+" séries de "+m[2]+(m[3]?" segundos":" repetições")+m[4])}
+    if(mod){el.querySelector(".tag").classList.add("mod");el.querySelector(".tag").title="Ajustado para hoje"}
+    const chk=el.querySelector(".chk");chk.setAttribute("aria-label","Marcar "+n+" como feito");
+    chk.onclick=()=>{const novo=!get(k);set(k,novo);el.classList.toggle("done",novo);chk.setAttribute("aria-pressed",novo);resumoDia()};
+    if(!SEM_CARGA.has(pz)){
+      const box=el.querySelector(".carga"),inp=box.querySelector("input"),[menos,mais]=box.querySelectorAll("button"),info=box.querySelector(".muted");
+      box.hidden=false;inp.id="carga-"+atual+"-"+i;box.querySelector("label").htmlFor=inp.id;
+      const [hb,ht]=ajudaEl("hc-"+atual+"-"+i,"carga","Anote o peso que você usou, em kg. Na máquina, é o número onde está o pino. Com halteres, o peso de um halter. Com barra, some a barra e os anilhas. Use − e + para ajustar de 1 em 1 ou digite (12,5 para meio quilo).");
+      box.appendChild(hb);ht.style.flexBasis="100%";box.appendChild(ht);
+      const atualiza=()=>{const h=S.cargas[n];if(h&&h.length>1){const dif=Math.round((h[h.length-1][1]-h[0][1])*10)/10;info.textContent=dif>0?"+"+fmtN(dif)+" kg desde o início":""}else info.textContent=h&&h.length?"anotado":""};
+      const mostra=()=>{const v=ultimaCarga(n);inp.value=v===null?"":fmtN(v)};mostra();atualiza();
+      const muda=d=>{const atual=lerNum(inp.value);const v=Math.min(500,Math.max(0,Math.round(((atual===null?0:atual)+d)*2)/2));gravarCarga(n,v);mostra();atualiza();info.textContent=info.textContent||"salvo"};
+      menos.onclick=()=>muda(-1);mais.onclick=()=>muda(1);
+      inp.onchange=()=>{const t=inp.value.trim();if(t===""){mostra();return}
+        const v=lerNum(t);if(v===null||v<0||v>500){mostra();info.textContent="Use um número de 0 a 500";return}
+        gravarCarga(n,v);mostra();atualiza();toast("Carga salva: "+fmtN(v)+" kg")};
+      inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();inp.blur()}};
+    }
+    lista.appendChild(el);
+    const cv=el.querySelector("canvas");cv.setAttribute("aria-label","Animação do movimento: "+n);
+    const d={cv,ctx:cv.getContext("2d"),p:POSES[pz],off:i*.17,pausa:reduz,t:.5};
+    const tog=()=>{d.pausa=!d.pausa};cv.onclick=tog;cv.onkeydown=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();tog()}};
+    demos.push(d);if(obs)obs.observe(cv);else d.vis=true;
+  });
+  resumoDia();dimensionar();
+}
+function resumoDia(){
+  const G=P(),D=G.dias[atual],p=Math.round(feitosDia(atual)/D.ex.length*100);
+  document.getElementById("pct").textContent=p+"%";
+  document.getElementById("barra").style.width=p+"%";
+  tabs.querySelectorAll("button").forEach(b=>{const d=b.id.slice(4),ok=feitosDia(d)===G.dias[d].ex.length;
+    b.classList.toggle("ok",ok);b.setAttribute("aria-label",d+(ok?", concluído":""))});
+  atualizarSemana();
+}
+function atualizarSemana(){
+  const tot=totalSemana(),f=DIAS.reduce((n,d)=>n+feitosDia(d),0),p=Math.round(f/tot*100);
+  document.getElementById("semPct").textContent=p+"%";
+  document.getElementById("semBarra").style.width=p+"%";
+  const diasOk=DIAS.filter(d=>feitosDia(d)===P().dias[d].ex.length).length;
+  document.getElementById("semanaCard").classList.toggle("completa",f===tot);
+  const [,m,dd]=semana.split("-");
+  document.getElementById("semLbl").textContent="Semana de "+dd+"/"+m;
+  document.getElementById("semMsg").textContent=!salvaOk?"Seu navegador não está salvando os dados. Saia da aba anônima para eles ficarem guardados."
+    :f===tot?"Semana completa! Parabéns, segunda começa uma nova.":diasOk+" de 5 dias concluídos · "+f+" de "+tot+" exercícios";
+}
+function dimensionar(){const dpr=window.devicePixelRatio||1;demos.forEach(d=>{const w=d.cv.clientWidth||300;d.cv.width=Math.round(w*dpr);d.cv.height=Math.round(w*.7*dpr)})}
+addEventListener("resize",dimensionar);
+
+function desenhar(d,t,cor){
+  const {ctx,cv,p}=d,s=cv.width/200;
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(s,0,0,s,0,0);
+  const pt={};for(const k in p.A){const a=p.A[k],b=p.B[k]||a;pt[k]={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}}
+  ctx.lineCap="round";ctx.lineJoin="round";
+  ctx.strokeStyle=cor.line;ctx.fillStyle=cor.line;ctx.lineWidth=3;
+  if(p.floor)Ln(ctx,8,p.floor+2,192,p.floor+2);
+  if(p.props){ctx.strokeStyle=cor.muted;ctx.fillStyle=cor.line;ctx.lineWidth=2.5;p.props(ctx,pt)}
+  const m=pt[p.m];ctx.fillStyle=cor.accent;ctx.globalAlpha=.28;Ci(ctx,m.x,m.y,15);ctx.globalAlpha=1;
+  ctx.strokeStyle=cor.fg;ctx.lineWidth=6;ctx.globalAlpha=.35;
+  ctx.beginPath();ctx.moveTo(pt.P.x,pt.P.y);ctx.lineTo(pt.k.x,pt.k.y);ctx.lineTo(pt.f.x,pt.f.y);
+  ctx.moveTo(pt.S.x,pt.S.y);ctx.lineTo(pt.e.x,pt.e.y);ctx.lineTo(pt.w.x,pt.w.y);ctx.stroke();ctx.globalAlpha=1;
+  ctx.lineWidth=8;Ln(ctx,pt.S.x,pt.S.y,pt.P.x,pt.P.y);
+  ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(pt.P.x,pt.P.y);ctx.lineTo(pt.K.x,pt.K.y);ctx.lineTo(pt.F.x,pt.F.y);
+  ctx.moveTo(pt.S.x,pt.S.y);ctx.lineTo(pt.E.x,pt.E.y);ctx.lineTo(pt.W.x,pt.W.y);ctx.stroke();
+  ctx.fillStyle=cor.fg;Ci(ctx,pt.H.x,pt.H.y,9);
+  ctx.fillStyle=cor.accent;Ci(ctx,m.x,m.y,4.5);
+}
+let ult=performance.now(),cor=null,quadro=0;
+function lerCores(){const cs=getComputedStyle(document.documentElement);
+  cor={fg:cs.getPropertyValue("--fg").trim(),accent:cs.getPropertyValue("--accent").trim(),line:cs.getPropertyValue("--line").trim(),muted:cs.getPropertyValue("--muted").trim()}}
+function loop(agora){
+  const dt=Math.min(agora-ult,100);ult=agora;
+  if(tela==="treino"){
+    if(!cor||quadro++%60===0)lerCores();
+    demos.forEach(d=>{if(!d.pausa){d.ph=((d.ph??d.off)+dt/2600)%1;d.t=(1-Math.cos(d.ph*Math.PI*2))/2}if(d.vis!==false||!d.desenhado){desenhar(d,d.t,cor);d.desenhado=true}});
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ================= Tela Progresso ================= */
+let cargaApagar=null;
+function renderProgresso(){
+  // histórico de semanas
+  const hist=document.getElementById("hist");hist.innerHTML="";
+  const tot=totalSemana();
+  for(let i=5;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-7*i);const w=semanaId(d);
+    const dados=S.semanas[(S.goal||"gluteo")+"|"+w]||{};
+    const p=Math.round(Object.keys(dados).length/tot*100);
+    const col=document.createElement("div");
+    const barra=document.createElement("i");barra.style.height=Math.max(3,p*.62)+"px";if(p>=100)barra.className="cheia";
+    const lbl=document.createElement("span");lbl.textContent=p+"%";
+    const dt=document.createElement("span");dt.textContent=i===0?"esta":w.slice(8)+"/"+w.slice(5,7);
+    col.append(lbl,barra,dt);hist.appendChild(col);
+  }
+  document.getElementById("histLbl").textContent=P().n;
+  // água
+  renderAgua();
+  // cargas
+  const tb=document.getElementById("cargas");tb.innerHTML="";
+  const nomes=Object.keys(S.cargas).filter(n=>S.cargas[n].length);
+  if(!nomes.length){tb.innerHTML='<tr><td class="muted">Nenhuma carga anotada ainda. Anote na tela de treino, embaixo de cada exercício.</td></tr>'}
+  else{
+    tb.innerHTML="<tr><th>Exercício</th><th>Início</th><th>Agora</th><th>Evolução</th><th><span class=\"sr\">Ações</span></th></tr>";
+    nomes.sort().forEach(n=>{const h=S.cargas[n],a=h[0][1],b=h[h.length-1][1],dif=Math.round((b-a)*10)/10;
+      const tr=document.createElement("tr");
+      [n,fmtN(a)+" kg",fmtN(b)+" kg"].forEach(t=>{const td=document.createElement("td");td.textContent=t;tr.appendChild(td)});
+      const td=document.createElement("td");td.textContent=dif>0?"+"+fmtN(dif)+" kg":dif<0?fmtN(dif)+" kg":"=";td.className=dif>0?"up":dif<0?"down":"";tr.appendChild(td);
+      const ta=document.createElement("td"),box=document.createElement("div");box.className="acoes-linha";
+      if(cargaApagar===n){
+        const sim=document.createElement("button");sim.type="button";sim.className="mini perigo";sim.textContent="Apagar";sim.setAttribute("aria-label","Confirmar: apagar cargas de "+n);
+        sim.onclick=()=>{delete S.cargas[n];cargaApagar=null;salvar("Cargas de "+n+" apagadas");renderProgresso()};
+        const nao=document.createElement("button");nao.type="button";nao.className="mini";nao.textContent="Não";nao.setAttribute("aria-label","Cancelar");nao.onclick=()=>{cargaApagar=null;renderProgresso()};
+        box.append(sim,nao);
+      }else{const ex=document.createElement("button");ex.type="button";ex.className="mini perigo";ex.textContent="Excluir";ex.setAttribute("aria-label","Excluir cargas de "+n);
+        ex.onclick=()=>{cargaApagar=n;renderProgresso()};box.appendChild(ex)}
+      ta.appendChild(box);tr.appendChild(ta);tb.appendChild(tr)});
+  }
+  renderMedidas();
+}
+function pesoAtual(){for(let i=S.medidas.length-1;i>=0;i--)if(S.medidas[i].peso)return S.medidas[i].peso;return null}
+function gravarMedida(d,campos){
+  let m=S.medidas.find(x=>x.d===d);
+  if(!m){m={d,peso:null,cintura:null,quadril:null};S.medidas.push(m);S.medidas.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
+  Object.assign(m,campos);
+  if(m.peso===null&&m.cintura===null&&m.quadril===null)S.medidas=S.medidas.filter(x=>x!==m);
+  if(S.medidas.length>60)S.medidas=S.medidas.slice(-60);
+}
+function copos(){const p=pesoAtual();return p?Math.min(16,Math.max(6,Math.ceil(p*35/250))):8}
+function renderAgua(){
+  const hojeIso=iso(new Date()),n=S.agua[hojeIso]||0,box=document.getElementById("agua");box.innerHTML="";
+  const meta=copos();
+  document.getElementById("aguaMeta").textContent=pesoAtual()?"Sua meta: "+meta+" copos ("+(meta*250/1000).toLocaleString("pt-BR")+" L), calculada pelo seu peso. Cada copo é 250 ml.":"Cada copo é 250 ml. Informe seu peso em Medidas ou na tela Nutrição para calcular sua meta.";
+  for(let i=0;i<Math.max(meta,n);i++){const b=document.createElement("button");b.type="button";b.className=i<n?"cheio":"";
+    b.setAttribute("aria-label","Copo "+(i+1)+(i<n?", bebido":""));
+    b.onclick=()=>{S.agua[hojeIso]=(i<n&&i===n-1)?i:i+1;salvar();renderAgua()};box.appendChild(b)}
+  document.getElementById("aguaTxt").textContent=(n*250>=1000?(n*250/1000).toLocaleString("pt-BR")+" L":n*250+" ml");
+}
+let medEdit=null,medApagar=null;
+function preencherMedidas(){
+  const d=medEdit||iso(new Date()),m=S.medidas.find(x=>x.d===d)||{peso:null,cintura:null,quadril:null};
+  [["mPeso","peso"],["mCintura","cintura"],["mQuadril","quadril"]].forEach(([id,k])=>{const el=document.getElementById(id);if(document.activeElement!==el)el.value=m[k]===null?"":fmtN(m[k])});
+  const ed=document.getElementById("medEditando");ed.hidden=!medEdit;
+  if(medEdit)document.getElementById("medEditTxt").textContent="Editando as medidas de "+medEdit.slice(8)+"/"+medEdit.slice(5,7);
+  document.getElementById("medSalvar").textContent=medEdit?"Salvar alterações":S.medidas.some(x=>x.d===iso(new Date()))?"Atualizar medidas de hoje":"Salvar medidas de hoje";
+}
+function renderMedidas(){
+  const tb=document.getElementById("medidas");tb.innerHTML="";
+  preencherMedidas();
+  if(!S.medidas.length)return;
+  tb.innerHTML="<tr><th>Data</th><th>Peso</th><th>Cintura</th><th>Quadril</th><th><span class=\"sr\">Ações</span></th></tr>";
+  const prim=S.medidas[0];
+  S.medidas.slice(-8).reverse().forEach(m=>{const tr=document.createElement("tr");if(m.d===medEdit)tr.className="editando";
+    const td0=document.createElement("td");td0.textContent=m.d.slice(8)+"/"+m.d.slice(5,7);tr.appendChild(td0);
+    [["peso","kg"],["cintura","cm"],["quadril","cm"]].forEach(([k,u])=>{const td=document.createElement("td");
+      td.textContent=m[k]===null?"–":fmtN(m[k])+" "+u;tr.appendChild(td)});
+    const ta=document.createElement("td");const box=document.createElement("div");box.className="acoes-linha";
+    const data=m.d.slice(8)+"/"+m.d.slice(5,7);
+    if(medApagar===m.d){
+      const sim=document.createElement("button");sim.type="button";sim.className="mini perigo";sim.textContent="Apagar";sim.setAttribute("aria-label","Confirmar: apagar medidas de "+data);
+      sim.onclick=()=>{S.medidas=S.medidas.filter(x=>x.d!==m.d);if(medEdit===m.d)medEdit=null;medApagar=null;salvar("Medidas de "+data+" apagadas");renderMedidas();renderAgua()};
+      const nao=document.createElement("button");nao.type="button";nao.className="mini";nao.textContent="Não";nao.setAttribute("aria-label","Cancelar");nao.onclick=()=>{medApagar=null;renderMedidas()};
+      box.append(sim,nao);
+    }else{
+      const ed=document.createElement("button");ed.type="button";ed.className="mini";ed.textContent="Editar";ed.setAttribute("aria-label","Editar medidas de "+data);
+      ed.onclick=()=>{medEdit=m.d;medApagar=null;renderMedidas();document.getElementById("formMedidas").scrollIntoView({block:"center"});document.getElementById("mPeso").focus()};
+      const ex=document.createElement("button");ex.type="button";ex.className="mini perigo";ex.textContent="Excluir";ex.setAttribute("aria-label","Excluir medidas de "+data);
+      ex.onclick=()=>{medApagar=m.d;renderMedidas()};
+      box.append(ed,ex);
+    }
+    ta.appendChild(box);tr.appendChild(ta);tb.appendChild(tr)});
+  const ult=S.medidas[S.medidas.length-1];
+  if(S.medidas.length>1&&prim.cintura!==null&&ult.cintura!==null){const d=Math.round((ult.cintura-prim.cintura)*10)/10;
+    document.getElementById("medMsg").textContent=d<0?"Sua cintura diminuiu "+fmtN(-d)+" cm desde a primeira medida.":"Continue medindo a cada 2 semanas pra ver a evolução."}
+}
+document.getElementById("medCancelar").onclick=()=>{medEdit=null;renderMedidas();document.getElementById("medMsg").textContent="Edição cancelada."};
+document.getElementById("formMedidas").addEventListener("submit",e=>{
+  e.preventDefault();
+  const msg=document.getElementById("medMsg"),campos={};
+  for(const [id,k,min,max,nome,u] of [["mPeso","peso",20,300,"O peso","kg"],["mCintura","cintura",30,250,"A cintura","cm"],["mQuadril","quadril",30,250,"O quadril","cm"]]){
+    const el=document.getElementById(id),t=el.value.trim();
+    if(t===""){campos[k]=null;continue}
+    const v=lerNum(t);campos[k]=v===null?null:num(v,min,max);
+    if(campos[k]===null){msg.textContent=nome+" precisa ser um número entre "+min+" e "+max+" "+u+".";el.focus();return}
+  }
+  const d=medEdit||iso(new Date()),existe=S.medidas.some(x=>x.d===d);
+  if(campos.peso===null&&campos.cintura===null&&campos.quadril===null){
+    if(existe){medApagar=d;renderMedidas();msg.textContent="Todos os campos estão vazios. Para apagar este dia, toque em Apagar na tabela."}
+    else msg.textContent="Preencha pelo menos uma medida.";
+    return}
+  gravarMedida(d,campos);
+  const data=d.slice(8)+"/"+d.slice(5,7);
+  msg.textContent=medEdit?"Medidas de "+data+" atualizadas.":"Medidas de hoje salvas.";
+  salvar(medEdit?"Medidas atualizadas":"Medidas salvas");
+  medEdit=null;renderMedidas();renderAgua();
+});
+/* ================= Ajuda (?) ================= */
+function ajudaEl(id,sobre,texto){
+  const b=document.createElement("button");b.type="button";b.className="ajuda";b.setAttribute("aria-expanded","false");b.setAttribute("aria-controls",id);b.setAttribute("aria-label","Ajuda: "+sobre);
+  const p=document.createElement("p");p.className="ajuda-txt";p.id=id;p.hidden=true;p.textContent=texto;return [b,p];
+}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".ajuda");if(!b)return;
+  const t=document.getElementById(b.getAttribute("aria-controls"));if(!t)return;
+  const abrir=t.hidden;t.hidden=!abrir;b.setAttribute("aria-expanded",abrir)});
+
+/* ================= Conta (login opcional com Firebase) ================= */
+const CONTA=(()=>{
+  const cfg=()=>{const c=window.TREINA_ELA_FIREBASE;return c&&c.apiKey&&c.apiKey.indexOf("COLE_")!==0?c:null};
+  const SDK="https://www.gstatic.com/firebasejs/10.12.2/";
+  let auth=null,fs=null,usuario=null,carregando=null,cooldown=0;
+  const $=id=>document.getElementById(id);
+  const msg=(t,ok)=>{const m=$("contaMsg");m.className="msg-campo"+(t?(ok?" ok":" erro"):"");m.textContent=t||""};
+  const ERROS={
+    "auth/invalid-email":"Esse e-mail não parece certo. Confira se digitou tudo.",
+    "auth/user-not-found":"E-mail ou senha incorretos.","auth/wrong-password":"E-mail ou senha incorretos.","auth/invalid-credential":"E-mail ou senha incorretos.","auth/invalid-login-credentials":"E-mail ou senha incorretos.",
+    "auth/email-already-in-use":"Já existe uma conta com esse e-mail. Toque em Entrar ou em Esqueci a senha.",
+    "auth/weak-password":"Senha fraca. Use pelo menos 8 caracteres com letras e números.",
+    "auth/too-many-requests":"Muitas tentativas seguidas. Espere alguns minutos e tente de novo.",
+    "auth/network-request-failed":"Sem internet. Confira a conexão e tente de novo.",
+    "auth/popup-closed-by-user":"Você fechou a janela do Google antes de terminar.","auth/cancelled-popup-request":"",
+    "auth/requires-recent-login":"Por segurança, saia e entre de novo na conta, depois tente excluir outra vez.",
+    "auth/user-disabled":"Essa conta foi desativada.","auth/operation-not-allowed":"Esse tipo de login ainda não foi ativado no app.",
+    "auth/unauthorized-domain":"Login ainda não liberado para este endereço do app."};
+  const erroTxt=e=>{const c=e&&e.code;return c in ERROS?ERROS[c]:"Não deu certo agora. Tente de novo em instantes."};
+  const emailOk=v=>/^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/.test(v)&&v.length<=254;
+  function senhaProblema(v){
+    if(v.length<8)return "A senha precisa ter pelo menos 8 caracteres.";
+    if(!/[A-Za-zÀ-ÿ]/.test(v)||!/\d/.test(v))return "Use letras e números na senha.";
+    if(v.length>128)return "Senha longa demais.";
+    return "";
+  }
+  function erroCampo(id,t){const el=$(id),e=$(id+"Err");if(t){e.textContent=t;e.hidden=false;el.setAttribute("aria-invalid","true");el.setAttribute("aria-describedby",id+"Err")}else{e.hidden=true;e.textContent="";el.removeAttribute("aria-invalid");el.removeAttribute("aria-describedby")}return !t}
+  function carregarSDK(){
+    if(window.firebase&&window.firebase.auth)return Promise.resolve();
+    if(carregando)return carregando;
+    const tag=src=>new Promise((ok,falha)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>falha({code:"auth/network-request-failed"});document.head.appendChild(s)});
+    carregando=tag(SDK+"firebase-app-compat.js").then(()=>Promise.all([tag(SDK+"firebase-auth-compat.js"),tag(SDK+"firebase-firestore-compat.js")]));
+    carregando.catch(()=>{carregando=null});
+    return carregando;
+  }
+  async function preparar(){
+    if(auth)return;
+    await carregarSDK();
+    const app=window.firebase.apps&&window.firebase.apps.length?window.firebase.app():window.firebase.initializeApp(cfg());
+    auth=window.firebase.auth();fs=window.firebase.firestore();
+    try{auth.languageCode="pt"}catch(e){}
+    auth.onAuthStateChanged(u=>{usuario=u;mudou()});
+    try{await auth.getRedirectResult()}catch(e){msg(erroTxt(e))}
+  }
+  function verificado(u){return !!u&&(u.emailVerified||(u.providerData||[]).some(p=>p.providerId==="google.com"))}
+  async function mudou(){
+    render();
+    if(usuario&&verificado(usuario)){
+      const d=fs.collection("usuarios").doc(usuario.uid);
+      nuvem.ref={get:async()=>{const x=await d.get();return {exists:x.exists,data:()=>x.data()}},set:v=>d.set(v)};
+      nuvem.tipo="firebase";nuvem.estado="conectando";statusNuvem();await puxarNuvem();
+    }else if(nuvem.tipo==="firebase"){nuvem.ref=null;nuvem.tipo=null;nuvem.estado="local";statusNuvem()}
+  }
+  function render(){
+    const card=$("contaCard");card.hidden=!cfg();if(card.hidden)return;
+    $("contaFora").hidden=!!usuario;$("contaDentro").hidden=!usuario;
+    if(usuario){
+      const em=usuario.email||"Conta Google";$("contaEmail").textContent=em;$("contaEmail2").textContent=em;
+      $("contaAvatar").textContent=(em[0]||"?");
+      const google=(usuario.providerData||[]).some(p=>p.providerId==="google.com");
+      $("contaTipo").textContent=google?"Entrou com Google":verificado(usuario)?"E-mail confirmado":"E-mail ainda não confirmado";
+      $("contaVerificar").hidden=verificado(usuario);
+    }
+  }
+  function aba(qual){["Entrar","Criar","Senha"].forEach(n=>{$("aba"+n).setAttribute("aria-selected",n===qual);$("form"+n).hidden=n!==qual});msg("")}
+  async function acao(btn,fn){
+    const b=btn;if(b.disabled)return;b.disabled=true;const t=b.textContent;b.textContent="Aguarde…";
+    try{await preparar();await fn()}catch(e){msg(erroTxt(e))}finally{b.disabled=false;b.textContent=t}
+  }
+  function ligar(){
+    ["Entrar","Criar","Senha"].forEach(n=>$("aba"+n).onclick=()=>aba(n));
+    document.querySelectorAll(".ver-senha").forEach(b=>b.onclick=()=>{const i=$(b.dataset.alvo),v=i.type==="password";i.type=v?"text":"password";b.textContent=v?"Ocultar":"Mostrar";b.setAttribute("aria-pressed",v)});
+    ["lEmail","lSenha","cEmail","cSenha","cSenha2","rEmail"].forEach(id=>$(id).addEventListener("input",()=>erroCampo(id,"")));
+    $("cAceite").addEventListener("change",()=>{$("cAceiteErr").hidden=true});
+    $("entrarGoogle").onclick=e=>acao(e.currentTarget,async()=>{
+      const p=new window.firebase.auth.GoogleAuthProvider();
+      try{await auth.signInWithPopup(p)}catch(x){if(x&&(x.code==="auth/popup-blocked"||x.code==="auth/operation-not-supported-in-this-environment"))await auth.signInWithRedirect(p);else throw x}
+      msg("Você entrou com Google.",true);toast("Conta conectada")});
+    $("formEntrar").addEventListener("submit",e=>{e.preventDefault();
+      const em=$("lEmail").value.trim(),se=$("lSenha").value;
+      const a=erroCampo("lEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":""),b=erroCampo("lSenha",!se?"Digite sua senha.":"");
+      if(!a||!b){(a?$("lSenha"):$("lEmail")).focus();return}
+      acao(e.submitter||$("formEntrar").querySelector("button[type=submit]"),async()=>{await auth.signInWithEmailAndPassword(em,se);$("lSenha").value="";msg("Você entrou.",true);toast("Conta conectada")})});
+    $("formCriar").addEventListener("submit",e=>{e.preventDefault();
+      const em=$("cEmail").value.trim(),s1=$("cSenha").value,s2=$("cSenha2").value;
+      const a=erroCampo("cEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":"");
+      const b=erroCampo("cSenha",s1?senhaProblema(s1):"Crie uma senha.");
+      const c=erroCampo("cSenha2",!s2?"Repita a senha.":s1!==s2?"As senhas não são iguais.":"");
+      const d=$("cAceite").checked;if(!d){$("cAceiteErr").textContent="Para criar a conta, aceite os Termos e a Política de Privacidade.";$("cAceiteErr").hidden=false}
+      if(!a||!b||!c||!d){const p=[["cEmail",a],["cSenha",b],["cSenha2",c]].find(x=>!x[1]);if(p)$(p[0]).focus();return}
+      acao(e.submitter||$("formCriar").querySelector("button[type=submit]"),async()=>{
+        const r=await auth.createUserWithEmailAndPassword(em,s1);
+        try{await r.user.sendEmailVerification()}catch(x){}
+        cooldown=Date.now()+60000;$("cSenha").value="";$("cSenha2").value="";
+        usuario=r.user;render();msg("Conta criada! Confirme seu e-mail para começar a salvar na nuvem.",true)})});
+    $("formSenha").addEventListener("submit",e=>{e.preventDefault();
+      const em=$("rEmail").value.trim();
+      if(!erroCampo("rEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":"")){$("rEmail").focus();return}
+      acao(e.submitter||$("formSenha").querySelector("button[type=submit]"),async()=>{
+        try{await auth.sendPasswordResetEmail(em)}catch(x){if(!(x&&(x.code==="auth/user-not-found")))throw x}
+        msg("Se existir uma conta com esse e-mail, você vai receber o link em alguns minutos. Olhe também o spam.",true)})});
+    $("jaConfirmei").onclick=e=>acao(e.currentTarget,async()=>{await usuario.reload();usuario=auth.currentUser;
+      if(verificado(usuario)){await usuario.getIdToken(true);msg("E-mail confirmado! Seus dados agora ficam salvos na nuvem.",true);await mudou()}
+      else msg("Ainda não aparece como confirmado. Toque no link do e-mail e tente de novo.")});
+    $("reenviar").onclick=e=>{const falta=Math.ceil((cooldown-Date.now())/1000);if(falta>0){msg("Espere "+falta+" segundos para reenviar.");return}
+      acao(e.currentTarget,async()=>{await usuario.sendEmailVerification();cooldown=Date.now()+60000;msg("E-mail reenviado para "+usuario.email+".",true)})};
+    $("sair").onclick=e=>acao(e.currentTarget,async()=>{await auth.signOut();msg("Você saiu. Seus dados continuam neste celular.",true);toast("Você saiu da conta")});
+    $("excluirConta").onclick=()=>{$("confirmaExcluir").hidden=false;$("excluirConta").hidden=true;$("naoExcluir").focus()};
+    $("naoExcluir").onclick=()=>{$("confirmaExcluir").hidden=true;$("excluirConta").hidden=false};
+    $("simExcluir").onclick=e=>acao(e.currentTarget,async()=>{
+      const u=auth.currentUser;if(!u)return;
+      clearTimeout(nuvem.timer);const ref=fs.collection("usuarios").doc(u.uid);
+      try{await ref.delete()}catch(x){if(x&&x.code!=="not-found"&&x.code!=="permission-denied")throw x}
+      await u.delete();
+      $("confirmaExcluir").hidden=true;$("excluirConta").hidden=false;
+      nuvem.ref=null;nuvem.tipo=null;nuvem.estado="local";statusNuvem();
+      msg("Sua conta e os dados da nuvem foram excluídos.",true);toast("Conta excluída")});
+  }
+  return {
+    disponivel:()=>!!cfg()&&!(window.claude&&window.claude.use),
+    iniciar(){
+      if(!cfg()||(window.claude&&window.claude.use)){$("contaCard").hidden=true;return}
+      ligar();render();
+      // carrega o SDK em seguida para lembrar quem já entrou
+      preparar().catch(()=>{msg("Sem internet: o login volta quando a conexão voltar. Seus dados continuam salvos neste celular.")});
+    },
+    _validar:{emailOk,senhaProblema}
+  };
+})();
+
+/* ================= Ciclo e cronograma do mês ================= */
+const SINTOMAS=[["energia","Com energia"],["normal","Normal"],["cansada","Cansada"],["colica","Com cólica"],["inchada","Inchada"]];
+const ORDEM=["men","fol","ovu","tpm"];
+const FASE={
+ men:{n:"Menstruação",sem:1,cor:"#c2416b",ink:"#ffffff",modo:"leve",
+  resumo:"A energia pode estar mais baixa e podem vir cólicas. Treino mais leve e foco em se sentir bem.",
+  treino:"Uma série a menos em cada exercício e cardio leve no lugar do intervalado. Se estiver bem, pode treinar normal.",
+  alim:["Ferro: feijão, lentilha, carne vermelha magra e folhas verde-escuras.","Junte vitamina C (laranja, acerola, limão) para aproveitar melhor o ferro.","Água, sopas e chás quentinhos costumam aliviar o desconforto.","Se estiver inchada, diminua o café e o sal."],
+  extra:"Sobremesa da fase: laranja ou acerola depois do almoço."},
+ fol:{n:"Pós-menstruação",sem:2,cor:"#26794f",ink:"#ffffff",modo:"forte",
+  resumo:"Muitas mulheres sentem mais energia e disposição. Boa fase para puxar mais no treino.",
+  treino:"Uma série a mais no primeiro exercício do dia. Bom momento para tentar subir a carga.",
+  alim:["Siga o cardápio do seu objetivo com capricho: é a fase mais fácil de manter a rotina.","Carboidrato antes do treino ajuda a render nas cargas mais pesadas.","Bom momento para preparar marmitas da semana."],
+  extra:"Lanche da fase: iogurte com aveia e fruta antes do treino."},
+ ovu:{n:"Ovulação",sem:3,cor:"#d69a1a",ink:"#1d1400",modo:"normal",
+  resumo:"A energia costuma continuar boa. Treino completo, com aquecimento e técnica caprichados.",
+  treino:"Treino normal do seu objetivo. Aqueça bem e mantenha a técnica nas cargas altas.",
+  alim:["Proteína em todas as refeições.","Fibras e verduras ajudam a chegar melhor na fase seguinte.","Hidratação em dia: leve a garrafinha."],
+  extra:"Lanche da fase: castanhas e uma fruta."},
+ tpm:{n:"TPM",sem:4,cor:"#7652c0",ink:"#ffffff",modo:"moderado",
+  resumo:"Pode vir inchaço, fome maior, irritação e cansaço. Mantenha a rotina com alguns ajustes.",
+  treino:"Uma série a menos nos dois últimos exercícios e cardio moderado. As cargas principais continuam.",
+  alim:["Fome maior é comum: planeje lanches com proteína e fibra para não exagerar.","Banana, castanhas, folhas verdes, iogurte e leite trazem magnésio e cálcio, que podem ajudar nos sintomas.","Menos sal e ultraprocessados ajudam no inchaço.","Vontade de doce? Um quadradinho de chocolate amargo depois do almoço."],
+  extra:"Lanche da fase: banana com pasta de amendoim ou iogurte com cacau."}
+};
+const GOAL_FASE={
+ gluteo:{men:"Mantenha elevação pélvica e abdução, com carga um pouco menor.",fol:"Hora de buscar recorde na elevação pélvica e no agachamento.",ovu:"Capriche na contração do glúteo e aqueça bem antes do agachamento.",tpm:"Glúteo continua: mantenha as cargas dos exercícios principais."},
+ secar:{men:"Troque o intervalado por caminhada. Tudo bem comer um pouco mais nesses dias.",fol:"Fase ótima para o intervalado mais forte e para manter a alimentação firme.",ovu:"Mantenha o ritmo do cardio e das refeições planejadas.",tpm:"O corpo retém líquido: a balança pode subir 1 a 2 kg sem ser gordura. Não desanime."},
+ definir:{men:"Priorize os exercícios principais e deixe os acessórios mais leves.",fol:"Bom momento para subir carga em todos os grupos.",ovu:"Treino completo com foco na técnica.",tpm:"Mantenha a constância. O inchaço passa em poucos dias."},
+ massa:{men:"Mantenha a proteína alta mesmo com menos fome.",fol:"Fase de recordes: tente subir a carga nos exercícios pesados.",ovu:"Continue comendo bem para sustentar as cargas altas.",tpm:"A fome maior ajuda a comer o suficiente: aproveite com comida de verdade."},
+ iniciante:{men:"Com cólica, faça só caminhada e alongamento. Tudo bem.",fol:"Ótima fase para aprender um exercício novo com o professor.",ovu:"Mantenha a rotina dos treinos da semana.",tpm:"Se bater desânimo, faça pelo menos metade do treino. Constância é o que conta."},
+ postura:{men:"Alongamento e caminhada leve aliviam a lombar nesses dias.",fol:"Bom momento para fortalecer costas e abdômen com mais carga.",ovu:"Treino completo com atenção à postura.",tpm:"Pranchas e alongamentos ajudam no desconforto da TPM."}
+};
+const MODOS={leve:"Versão leve",moderado:"Versão moderada",forte:"Versão forte",normal:"Treino normal"};
+const dataLocal=s=>{const [a,m,d]=s.split("-").map(Number);return new Date(a,m-1,d)};
+const diasEntre=(a,b)=>Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/864e5);
+const ddmm=d=>pad(d.getDate())+"/"+pad(d.getMonth()+1);
+function limitesFases(C,L){
+  const w1=Math.min(Math.max(7,L),C-14),w4=C-6,w3=Math.min(Math.max(C-15,w1+2),w4-3);
+  return {men:[1,w1],fol:[w1+1,w3-1],ovu:[w3,w4-1],tpm:[w4,C]};
+}
+function cicloInfo(hoje=new Date()){
+  if(!S.ciclo.inicio)return null;
+  const ini=dataLocal(S.ciclo.inicio),C=S.ciclo.dur,dias=diasEntre(ini,hoje);
+  if(dias<0)return {futuro:true};
+  const n=Math.floor(dias/C),dia=dias%C+1,lim=limitesFases(C,S.ciclo.menst);
+  const fase=ORDEM.find(k=>dia>=lim[k][0]&&dia<=lim[k][1]);
+  const inicioAtual=new Date(ini);inicioAtual.setDate(ini.getDate()+n*C);
+  const semanas=ORDEM.map(k=>{const a=new Date(inicioAtual);a.setDate(a.getDate()+lim[k][0]-1);const b=new Date(inicioAtual);b.setDate(b.getDate()+lim[k][1]-1);return {k,de:lim[k][0],ate:lim[k][1],a,b}});
+  const prox=new Date(inicioAtual);prox.setDate(prox.getDate()+C);
+  return {dia,C,fase,semanas,prox,faltam:diasEntre(hoje,prox),antigo:n>=3};
+}
+function modoHoje(){
+  const d=iso(new Date()),st=S.sintomas[d],ci=cicloInfo();
+  if(S.normal[d])return {k:"normal",motivo:"Você escolheu o treino normal hoje."};
+  if(st==="colica"||st==="cansada")return {k:"leve",motivo:"Ajustado porque você está "+(st==="colica"?"com cólica":"cansada")+" hoje."};
+  if(st==="inchada")return {k:"moderado",motivo:"Ajustado porque você está inchada hoje."};
+  if(st==="energia")return {k:"forte",motivo:"Ajustado porque você está com energia hoje."};
+  if(ci&&!ci.futuro&&S.ciclo.ajustar){const f=FASE[ci.fase];return {k:f.modo,motivo:f.modo==="normal"?"Fase "+f.n+": treino completo.":"Ajustado pela fase do ciclo ("+f.n+")."}}
+  return {k:"normal",motivo:""};
+}
+function transformar(lista,modo){
+  if(modo==="normal")return lista.map(e=>[...e,false]);
+  const menos=x=>x.replace(/^(\d+)×/,(m,n)=>Math.max(2,n-1)+"×"),mais=x=>x.replace(/^(\d+)×/,(m,n)=>Math.min(5,+n+1)+"×");
+  const N=lista.length;
+  return lista.map(([n,s,dica,pz],i)=>{
+    const interv=/intervalad/i.test(n);
+    if(modo==="leve"){
+      if(pz==="jack")return ["Caminhada leve","15 min","Ritmo confortável. Ajuda a aliviar cólicas.","walk",true];
+      if(interv)return ["Bicicleta leve","15 min","Ritmo confortável, sem tiros fortes.","bike",true];
+      const s2=menos(s);return [n,s2,dica,pz,s2!==s];
+    }
+    if(modo==="moderado"){
+      if(interv)return ["Bicicleta moderada",s,"Ritmo constante, sem tiros fortes.","bike",true];
+      if(pz==="jack")return ["Polichinelo leve","3×30s","Sem saltos altos, no seu ritmo.","jack",true];
+      if(i>=N-2){const s2=menos(s);return [n,s2,dica,pz,s2!==s]}
+      return [n,s,dica,pz,false];
+    }
+    if(modo==="forte"&&i===0){const s2=mais(s);return [n,s2,s2!==s?dica+" Hoje, tente subir a carga.":dica,pz,s2!==s]}
+    return [n,s,dica,pz,false];
+  });
+}
+function renderBanner(modo){
+  const box=document.getElementById("faseBanner"),ci=cicloInfo(),d=iso(new Date());box.innerHTML="";
+  const f=ci&&!ci.futuro?FASE[ci.fase]:null;
+  box.style.setProperty("--fase",f?f.cor:"var(--line)");
+  const top=document.createElement("div");top.className="fase-top";
+  const b=document.createElement("b");const sp=document.createElement("span");
+  if(f){b.textContent="Semana "+f.sem+" · "+f.n;sp.textContent="Dia "+ci.dia+" do ciclo"}
+  else{b.textContent="Como você está hoje?";sp.textContent=""}
+  top.append(b,sp);box.appendChild(top);
+  if(!f)sp.remove();
+  if(f){const p=document.createElement("p");p.className="small";p.style.margin="0";p.textContent=f.resumo+" "+GOAL_FASE[S.goal||"gluteo"][ci.fase];box.appendChild(p)}
+  const [hb,ht]=ajudaEl("hSint","como você está hoje","Escolha como você se sente hoje e o treino se ajusta: Cansada ou Com cólica deixa o treino mais leve, Inchada deixa moderado e Com energia deixa mais forte. Toque de novo para desmarcar. A escolha vale só para hoje.");
+  if(f){const r=document.createElement("div");r.className="rot";const q=document.createElement("span");q.className="t-rot small";q.textContent="Como você está hoje?";r.append(q,hb);box.append(r,ht)}
+  else{top.appendChild(hb);top.style.flexWrap="nowrap";box.appendChild(ht)}
+  const chips=document.createElement("div");chips.className="chips";chips.setAttribute("role","group");chips.setAttribute("aria-label","Como você está hoje");
+  SINTOMAS.forEach(([k,t])=>{const c=document.createElement("button");c.type="button";c.textContent=t;c.dataset.s=k;c.setAttribute("aria-pressed",S.sintomas[d]===k);
+    c.onclick=()=>{if(S.sintomas[d]===k)delete S.sintomas[d];else S.sintomas[d]=k;delete S.normal[d];salvar();renderTreino()};chips.appendChild(c)});
+  box.appendChild(chips);
+  if(modo.k!=="normal"||S.normal[d]){
+    const m=document.createElement("div");m.className="modo";
+    const t=document.createElement("span");t.innerHTML="<b></b> ";t.querySelector("b").textContent=MODOS[modo.k]+".";t.append(modo.motivo);
+    const bt=document.createElement("button");bt.type="button";bt.className="btn";bt.id="trocarModo";
+    bt.textContent=S.normal[d]?"Voltar ao ajustado":"Treinar normal hoje";
+    bt.onclick=()=>{if(S.normal[d])delete S.normal[d];else S.normal[d]=1;salvar();renderTreino()};
+    m.append(t,bt);box.appendChild(m);
+  }
+  if(!S.ciclo.inicio){const a=document.createElement("button");a.type="button";a.className="btn";a.id="irCiclo";a.textContent="Configurar meu ciclo";a.style.alignSelf="flex-start";a.onclick=()=>ir("ciclo");
+    const p=document.createElement("p");p.className="small muted";p.style.margin="0";p.textContent="Configure seu ciclo para o treino e a alimentação se ajustarem às fases do mês.";box.append(p,a)}
+}
+const selCiclo=(id,de,ate,txt)=>{const el=document.getElementById(id);if(el.options.length)return;for(let i=de;i<=ate;i++){const o=document.createElement("option");o.value=i;o.textContent=txt(i);el.appendChild(o)}};
+function renderCiclo(preencher){
+  selCiclo("cDur",21,45,i=>"A cada "+i+" dias"+(i===28?" (comum)":""));selCiclo("cMen",2,10,i=>i+" dias"+(i===5?" (comum)":""));
+  const ini=document.getElementById("cInicio"),dur=document.getElementById("cDur"),men=document.getElementById("cMen"),aj=document.getElementById("cAjustar");
+  const hoje=new Date(),min=new Date();min.setDate(min.getDate()-120);
+  ini.max=iso(hoje);ini.min=iso(min);
+  if(preencher&&document.activeElement!==ini){ini.value=S.ciclo.inicio;dur.value=S.ciclo.dur;men.value=S.ciclo.menst;aj.checked=S.ciclo.ajustar}
+  document.getElementById("cLimpar").hidden=!S.ciclo.inicio;
+  // hoje
+  const box=document.getElementById("cicloHoje"),ci=cicloInfo();box.innerHTML="";
+  const h3=document.createElement("h3");h3.textContent="Hoje";box.appendChild(h3);
+  const add=(tag,txt,cls)=>{const e=document.createElement(tag);e.textContent=txt;if(cls)e.className=cls;e.style.margin="0";box.appendChild(e);return e};
+  if(!ci){add("p","Preencha o seu ciclo abaixo para ver em que fase você está e montar o cronograma do mês.","muted")}
+  else if(ci.futuro){add("p","A data salva está no futuro. Corrija abaixo.","msg-campo erro")}
+  else{
+    const f=FASE[ci.fase];box.style.setProperty("--fase",f.cor);
+    const top=document.createElement("div");top.className="fase-top";const pill=document.createElement("span");pill.className="pill";pill.style.background=f.cor;pill.style.color=f.ink;pill.textContent="Semana "+f.sem;
+    const b=document.createElement("b");b.textContent=f.n;const sp=document.createElement("span");sp.textContent="Dia "+ci.dia+" de "+ci.C;
+    const esq=document.createElement("div");esq.className="linha";esq.append(pill,b);top.append(esq,sp);box.appendChild(top);
+    const lim=limitesFases(ci.C,S.ciclo.menst),barra=document.createElement("div");barra.className="linha-ciclo";barra.setAttribute("role","img");
+    barra.setAttribute("aria-label","Linha do ciclo: hoje é o dia "+ci.dia+" de "+ci.C+", na fase "+f.n);
+    ORDEM.forEach(k=>{const seg=document.createElement("i");seg.style.background=FASE[k].cor;seg.style.width=((lim[k][1]-lim[k][0]+1)/ci.C*100)+"%";barra.appendChild(seg)});
+    const mk=document.createElement("b");mk.style.left=((ci.dia-.5)/ci.C*100)+"%";mk.title="Hoje";barra.appendChild(mk);box.appendChild(barra);
+    const leg=document.createElement("div");leg.className="linha-leg";leg.setAttribute("aria-hidden","true");["Menstruação","Pós","Ovulação","TPM"].forEach(t=>{const x=document.createElement("span");x.textContent=t;leg.appendChild(x)});box.appendChild(leg);
+    add("p",f.resumo,"small");
+    add("p","Próxima menstruação prevista: "+ddmm(ci.prox)+(ci.faltam===1?" (amanhã)":" (em "+ci.faltam+" dias)")+". É uma estimativa.","small muted");
+    if(ci.antigo)add("p","Faz mais de 3 ciclos desde a data salva. Atualize quando a menstruação vier para a previsão ficar certa.","msg-campo erro");
+  }
+  const bt=document.createElement("button");bt.type="button";bt.className="btn";bt.id="menstruouHoje";bt.textContent="Minha menstruação começou hoje";bt.style.alignSelf="flex-start";
+  bt.onclick=()=>{S.ciclo.inicio=iso(new Date());salvar();const m=document.getElementById("cMsg");m.className="msg-campo ok";m.textContent="Ciclo atualizado: hoje é o dia 1.";renderCiclo(true)};
+  box.appendChild(bt);
+  // cronograma
+  const cr=document.getElementById("cronograma");cr.innerHTML="";
+  const g=S.goal||"gluteo",lim=limitesFases(S.ciclo.dur,S.ciclo.menst);
+  ORDEM.forEach(k=>{const f=FASE[k],c=document.createElement("div");c.className="semana-c"+(ci&&!ci.futuro&&ci.fase===k?" atual":"");c.style.setProperty("--fase",f.cor);
+    const sw=ci&&!ci.futuro?ci.semanas.find(x=>x.k===k):null;
+    const top=document.createElement("div");top.className="fase-top";
+    const esq=document.createElement("div");esq.className="linha";const pill=document.createElement("span");pill.className="pill";pill.style.background=f.cor;pill.style.color=f.ink;pill.textContent="Semana "+f.sem;
+    const b=document.createElement("b");b.textContent=f.n;esq.append(pill,b);
+    const sp=document.createElement("span");sp.textContent=sw?ddmm(sw.a)+" a "+ddmm(sw.b):"dias "+lim[k][0]+" a "+lim[k][1];
+    top.append(esq,sp);c.appendChild(top);
+    if(ci&&!ci.futuro&&ci.fase===k){const v=document.createElement("p");v.className="small";v.innerHTML="<strong>Você está aqui</strong>";c.appendChild(v)}
+    const linha=(rot,txt)=>{const p=document.createElement("p");const st=document.createElement("strong");st.textContent=rot+": ";p.append(st,txt);c.appendChild(p)};
+    linha("Treino",f.treino);linha("Alimentação",f.alim[0]);linha("Seu objetivo",GOAL_FASE[g][k]);
+    cr.appendChild(c)});
+}
+document.getElementById("formCiclo").addEventListener("submit",e=>{
+  e.preventDefault();
+  const ini=document.getElementById("cInicio"),msg=document.getElementById("cMsg"),campo=ini.closest(".campo");
+  const v=ini.value,hoje=iso(new Date()),min=new Date();min.setDate(min.getDate()-120);
+  campo.classList.remove("erro");msg.className="msg-campo erro";
+  if(!v){msg.textContent="Escolha o primeiro dia da sua última menstruação.";campo.classList.add("erro");ini.focus();return}
+  if(!isDate(v)||v<"1999"){msg.textContent="Data inválida. Escolha no calendário.";campo.classList.add("erro");ini.focus();return}
+  if(v>hoje){msg.textContent="A data não pode estar no futuro.";campo.classList.add("erro");ini.focus();return}
+  if(v<iso(min)){msg.textContent="Use a data da última menstruação, dos últimos 4 meses.";campo.classList.add("erro");ini.focus();return}
+  S.ciclo.inicio=v;S.ciclo.dur=Number(document.getElementById("cDur").value)||28;S.ciclo.menst=Number(document.getElementById("cMen").value)||5;
+  S.ciclo.ajustar=document.getElementById("cAjustar").checked;salvar();
+  const ci=cicloInfo();msg.className="msg-campo ok";msg.textContent="Ciclo salvo. Hoje é o dia "+ci.dia+": "+FASE[ci.fase].n+".";toast("Ciclo salvo");
+  renderCiclo(false);
+});
+document.getElementById("cAjustar").addEventListener("change",e=>{S.ciclo.ajustar=e.target.checked;salvar();const m=document.getElementById("cMsg");m.className="msg-campo ok";m.textContent=e.target.checked?"Treino e alimentação vão se ajustar ao ciclo.":"Ajuste pelo ciclo desligado.";});
+document.getElementById("cInicio").addEventListener("input",()=>{document.getElementById("cInicio").closest(".campo").classList.remove("erro")});
+["cInicio","cDur","cMen"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{const m=document.getElementById("cMsg");m.className="msg-campo";m.textContent="Toque em \"Salvar ciclo\" para guardar."}));
+let confirmaLimpar=false;
+document.getElementById("cLimpar").addEventListener("click",e=>{
+  if(!confirmaLimpar){confirmaLimpar=true;e.target.textContent="Toque de novo para apagar";setTimeout(()=>{confirmaLimpar=false;e.target.textContent="Apagar dados do ciclo"},4000);return}
+  confirmaLimpar=false;e.target.textContent="Apagar dados do ciclo";S.ciclo=CICLO0();salvar();
+  const m=document.getElementById("cMsg");m.className="msg-campo ok";m.textContent="Dados do ciclo apagados.";renderCiclo(true)});
+document.getElementById("abrirDicas").onclick=()=>ir("dicas");
+document.getElementById("voltarPerfil").onclick=()=>ir("objetivo");
+
+/* ================= Tela Alimentação ================= */
+const PLANOS={
+ equilibrio:{prato:[["Verduras e legumes",50,"#3f9e5a"],["Proteína",25,"#c0563a"],["Carboidrato",25,"#d9a521"]],
+  pratoDica:"Comece pela salada. Proteína do tamanho da palma da mão e carboidrato do tamanho do punho fechado.",
+  ref:[
+  ["Café da manhã","6h–9h",["2 ovos mexidos, 1 pão integral e 1 fruta","Iogurte natural com aveia, banana e canela","Tapioca com queijo branco e ovo, café com leite"]],
+  ["Almoço","12h–13h",["Arroz, feijão, frango grelhado e salada à vontade com azeite","Arroz integral, lentilha, peixe assado e legumes no vapor","Macarrão integral com carne moída magra, molho de tomate e salada verde"]],
+  ["Pré-treino","1 a 2h antes",["Banana com pasta de amendoim","Pão integral com queijo branco","Iogurte natural com granola sem açúcar"]],
+  ["Pós-treino","até 2h depois",["Sanduíche de frango desfiado com salada","Vitamina de leite com banana e aveia","2 ovos cozidos e 1 fruta"]],
+  ["Jantar","19h–21h",["Omelete de 2 ovos com legumes e salada","Frango com batata-doce e brócolis","Sopa de legumes com carne ou frango desfiado"]]]},
+ secar:{prato:[["Verduras e legumes",50,"#3f9e5a"],["Proteína",30,"#c0563a"],["Carboidrato",20,"#d9a521"]],
+  pratoDica:"Metade do prato com verduras e legumes enche e tem poucas calorias. Diminua um pouco o carboidrato, sem tirar.",
+  ref:[
+  ["Café da manhã","6h–9h",["2 ovos mexidos com tomate e 1 fatia de pão integral","Iogurte natural com morangos e chia","Crepioca (1 ovo e 2 colheres de goma de tapioca) com queijo branco"]],
+  ["Almoço","12h–13h",["Meia concha de feijão, 3 colheres de arroz, frango grelhado e metade do prato de salada","Peixe assado, legumes refogados e 2 colheres de arroz integral","Carne magra, abobrinha refogada, feijão e salada verde"]],
+  ["Pré-treino","1 a 2h antes",["1 fruta (maçã, banana ou pera)","1 iogurte natural","Café sem açúcar com 1 fruta"]],
+  ["Pós-treino","até 2h depois",["Iogurte natural com fruta picada","Atum com salada e 2 torradas integrais","2 ovos cozidos com pepino e tomate"]],
+  ["Jantar","19h–21h",["Salada grande com frango desfiado e grão-de-bico","Omelete de legumes com salada","Sopa de legumes com frango desfiado"]]]},
+ massa:{prato:[["Verduras e legumes",35,"#3f9e5a"],["Proteína",30,"#c0563a"],["Carboidrato",35,"#d9a521"]],
+  pratoDica:"Prato mais caprichado no carboidrato e na proteína. Verduras continuam presentes, mas sem encher demais antes da comida.",
+  ref:[
+  ["Café da manhã","6h–9h",["3 ovos, 2 fatias de pão integral, 1 fruta e café com leite","Panqueca de banana e aveia com mel e iogurte","Cuscuz com ovos e queijo e 1 copo de suco natural"]],
+  ["Almoço","12h–13h",["Arroz, feijão, bife, farofa simples e salada","Arroz, feijão, frango, batata assada e legumes","Macarrão com carne moída, queijo ralado e salada"]],
+  ["Pré-treino","1 a 2h antes",["Pão com queijo e 1 banana","Batata-doce com frango desfiado","Vitamina de banana com aveia"]],
+  ["Pós-treino","até 2h depois",["Arroz, feijão e 2 ovos (prato pequeno)","Sanduíche de frango com queijo e 1 copo de suco","Iogurte com granola e fruta"]],
+  ["Jantar","19h–21h",["Arroz, feijão, carne e legumes","Escondidinho de mandioca com carne moída e salada","Peixe, purê de batata e salada"]]]}
+};
+const NUTRI={
+ gluteo:{plano:"equilibrio",prot:[1.6,2.0],resumo:"Proteína em todas as refeições e carboidrato perto do treino, para ter força nos exercícios de perna e ajudar o glúteo a crescer.",
+  principios:["Proteína em todas as refeições ajuda o glúteo a se recuperar e crescer.","Coma carboidrato (arroz, batata, frutas) 1 a 2 horas antes do treino de pernas para ter força.","Não corte o carboidrato: sem energia, o treino pesado de glúteo rende menos.","Se também quiser secar, diminua só um pouco o carboidrato do jantar."]},
+ secar:{plano:"secar",prot:[1.6,2.2],resumo:"Comer um pouco menos do que o corpo gasta, com bastante proteína e verduras, para perder gordura sem perder músculo.",
+  principios:["Para perder gordura é preciso comer um pouco menos do que o corpo gasta. Um corte pequeno e constante funciona melhor que dieta radical.","Proteína alta ajuda a manter os músculos enquanto você seca.","Não pule refeições e evite chegar com muita fome ao almoço ou ao jantar.","Não corte grupos inteiros de alimentos. Se sentir tontura, fraqueza ou muito cansaço, coma mais e procure uma nutricionista."]},
+ definir:{plano:"equilibrio",prot:[1.6,2.0],resumo:"Peso estável ou caindo bem devagar, com proteína distribuída no dia e comida de verdade.",
+  principios:["Mantenha o peso estável ou com uma queda bem lenta.","Divida a proteína em 4 a 5 refeições no dia.","Monte a base com comida de verdade: arroz, feijão, ovos, carnes, frutas e legumes.","Diminua ultraprocessados, doces e bebidas açucaradas no dia a dia."]},
+ massa:{plano:"massa",prot:[1.6,2.2],resumo:"Comer um pouco mais do que o corpo gasta, com proteína e carboidrato em todas as refeições, para ganhar músculo.",
+  principios:["Para ganhar músculo é preciso comer um pouco mais do que você gasta.","Inclua um lanche a mais por dia, como uma vitamina ou um sanduíche.","Carboidrato em todas as refeições dá energia para os treinos pesados.","Se o peso não subir em 3 a 4 semanas, aumente um pouco as porções. Uma ceia com leite ou iogurte também ajuda."]},
+ iniciante:{plano:"equilibrio",prot:[1.2,1.6],resumo:"Pequenas mudanças, uma por semana: café da manhã com proteína, água ao longo do dia e um lanche antes do treino.",
+  principios:["Não precisa mudar tudo de uma vez. Comece com uma mudança por semana.","Tome café da manhã com alguma proteína: ovo, iogurte ou queijo.","Leve uma garrafinha e beba água ao longo do dia.","Coma algo leve 1 a 2 horas antes do treino para não passar mal."]},
+ postura:{plano:"equilibrio",prot:[1.2,1.6],resumo:"Alimentação equilibrada com atenção aos ossos e músculos: proteína, cálcio e boas gorduras.",
+  principios:["Leite, iogurte e queijos trazem cálcio, que ajuda os ossos.","Proteína em todas as refeições fortalece os músculos das costas e do abdômen.","Peixes, castanhas e azeite são boas fontes de gordura.","Mantenha horários regulares para ter energia o dia todo."]}
+};
+const TREINO_DIA=["1 a 2 horas antes: refeição leve com carboidrato e um pouco de proteína (o pré-treino do cardápio).","Treina logo cedo? Uma banana ou um café com leite já ajuda.","Até 2 horas depois: refeição com proteína e carboidrato (o pós-treino do cardápio).","Água: 1 copo antes, goles durante e mais 1 ou 2 copos depois."];
+const TREINO_EXTRA={secar:"Treinar em jejum não queima mais gordura no fim do dia. Faça do jeito que você se sentir melhor.",massa:"Nos dias de treino pesado, capriche no carboidrato do almoço e do pós-treino.",iniciante:"Se sentir tontura no treino, pare, beba água e coma algo. Na próxima vez, faça o lanche antes."};
+const TROCAS=[["Refrigerante","Água com gás e limão"],["Biscoito recheado","Fruta com pasta de amendoim"],["Suco de caixinha","Fruta inteira"],["Salgadinho","Pipoca feita na panela"],["Fritura","Assado ou na airfryer"],["Pão branco","Pão integral ou tapioca"]];
+function renderAlimentacao(){
+  const id=S.goal||"gluteo",N=NUTRI[id],PL=PLANOS[N.plano],g=OBJ[id];
+  document.getElementById("alTitulo").textContent="Alimentação · "+g.n;
+  document.getElementById("alResumo").textContent=N.resumo;
+  const ci=cicloInfo(),af=document.getElementById("alFase");af.innerHTML="";
+  af.hidden=!(ci&&!ci.futuro&&S.ciclo.ajustar);
+  if(!af.hidden){const f=FASE[ci.fase];af.style.setProperty("--fase",f.cor);
+    const top=document.createElement("div");top.className="fase-top";const b=document.createElement("b");b.textContent="Semana "+f.sem+" · "+f.n;const sp=document.createElement("span");sp.textContent="Dia "+ci.dia+" do ciclo";top.append(b,sp);
+    const u=document.createElement("ul");u.className="lista-simples";f.alim.forEach(x=>{const li=document.createElement("li");li.textContent=x;u.appendChild(li)});
+    const ex=document.createElement("p");ex.className="small";ex.style.margin="0";const st=document.createElement("strong");st.textContent=f.extra;ex.appendChild(st);
+    af.append(top,u,ex)}
+  // metas
+  const p=pesoAtual(),inp=document.getElementById("alPeso");
+  if(document.activeElement!==inp)inp.value=p?fmtN(p):"";
+  const metas=document.getElementById("alMetas");metas.innerHTML="";
+  const card=(v,l)=>{const d=document.createElement("div");d.className="meta";const b=document.createElement("b");b.textContent=v;const sp=document.createElement("span");sp.textContent=l;d.append(b,sp);metas.appendChild(d)};
+  if(p){
+    const a=Math.round(p*N.prot[0]),b=Math.round(p*N.prot[1]);
+    card(a+"–"+b+" g","proteína por dia ("+fmtN(N.prot[0])+" a "+fmtN(N.prot[1])+" g por kg)");
+    card(Math.round(a/4)+"–"+Math.round(b/4)+" g","proteína por refeição principal");
+    card((copos()*250/1000).toLocaleString("pt-BR")+" L","de água por dia ("+copos()+" copos)");
+    card(N.plano==="massa"?"5 a 6":"4 a 5","refeições por dia");
+  }else{
+    card("–","proteína por dia");card("–","água por dia");
+    document.getElementById("alPesoMsg").textContent="Informe seu peso para calcular proteína e água.";
+  }
+  // prato
+  const disco=document.getElementById("alDisco");let ac=0;
+  disco.style.background="conic-gradient("+PL.prato.map(([,v,c])=>{const t=c+" "+ac+"% "+(ac+v)+"%";ac+=v;return t}).join(",")+")";
+  disco.setAttribute("aria-label","Prato: "+PL.prato.map(([n,v])=>n+" "+v+"%").join(", "));
+  const leg=document.getElementById("alLegenda");leg.innerHTML="";
+  PL.prato.forEach(([n,v,c])=>{const d=document.createElement("div");const i=document.createElement("i");i.style.background=c;const t=document.createElement("span");t.textContent=n+" · "+(v===50?"metade":v===25?"1/4":v+"%");d.append(i,t);leg.appendChild(d)});
+  document.getElementById("alPratoDica").textContent=PL.pratoDica;
+  renderRefeicoes();
+  // treino, princípios, trocas
+  const ul=(id,arr)=>{const u=document.getElementById(id);u.innerHTML="";arr.forEach(x=>{const li=document.createElement("li");li.textContent=x;u.appendChild(li)})};
+  ul("alTreino",TREINO_DIA.concat(TREINO_EXTRA[id]?[TREINO_EXTRA[id]]:[]));
+  ul("alPrincipios",N.principios);
+  const tr=document.getElementById("alTrocas");tr.innerHTML="";
+  TROCAS.forEach(([a,b])=>{const d=document.createElement("div");const x=document.createElement("s");x.textContent=a;const seta=document.createElement("span");seta.textContent="→";seta.setAttribute("aria-label","troque por");const y=document.createElement("b");y.textContent=b;d.append(x,seta,y);tr.appendChild(d)});
+}
+function renderRefeicoes(){
+  const id=S.goal||"gluteo",PL=PLANOS[NUTRI[id].plano],dia=iso(new Date()),R=S.refeicoes[dia]||{};
+  const box=document.getElementById("alRefeicoes");box.innerHTML="";let feitas=0;
+  PL.ref.forEach(([nome,hora,ops],i)=>{
+    const v=R[i]||0,op=Math.floor(v/2)%ops.length,feita=v%2===1;if(feita)feitas++;
+    const el=document.createElement("div");el.className="ref"+(feita?" feita":"");
+    el.innerHTML='<button class="chk" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><div class="ref-top"><b></b><span></span></div><p></p><button class="outra" type="button">Outra opção</button>';
+    el.querySelector("b").textContent=nome;el.querySelector(".ref-top span").textContent=hora;el.querySelector("p").textContent=ops[op];
+    const chk=el.querySelector(".chk");chk.setAttribute("aria-pressed",feita);chk.setAttribute("aria-label","Marcar "+nome+" como feita");
+    const grava=(o,f)=>{const r={...(S.refeicoes[dia]||{})};r[i]=o*2+(f?1:0);S.refeicoes[dia]=r;salvar();renderRefeicoes()};
+    chk.onclick=()=>grava(op,!feita);
+    const outra=el.querySelector(".outra");outra.setAttribute("aria-label","Outra opção de "+nome);outra.onclick=()=>grava((op+1)%ops.length,feita);
+    box.appendChild(el);
+  });
+  document.getElementById("alFeitas").textContent=feitas+" de "+PL.ref.length;
+}
+document.getElementById("formPeso").addEventListener("submit",e=>{
+  e.preventDefault();
+  const inp=document.getElementById("alPeso"),msg=document.getElementById("alPesoMsg"),t=lerNum(inp.value),v=t===null?null:num(t,30,300);
+  if(v===null){msg.textContent="Digite um peso entre 30 e 300 kg.";inp.focus();return}
+  gravarMedida(iso(new Date()),{peso:v});salvar("Peso salvo: "+fmtN(v)+" kg");msg.textContent="Peso salvo e metas calculadas para "+fmtN(v)+" kg.";renderAlimentacao();
+});
+
+/* ================= Tela Dicas ================= */
+let filtro="Todas";
+function renderDicas(){
+  const cats=["Todas",...new Set(DICAS.map(d=>d[0]))],f=document.getElementById("filtros");f.innerHTML="";
+  cats.forEach(c=>{const b=document.createElement("button");b.type="button";b.textContent=c;b.setAttribute("aria-pressed",c===filtro);
+    b.onclick=()=>{filtro=c;renderDicas()};f.appendChild(b)});
+  const box=document.getElementById("dicas");box.innerHTML="";
+  const g=P();
+  if(filtro==="Todas"){const c=document.createElement("div");c.className="aviso";const b=document.createElement("b");b.textContent="Para o seu objetivo ("+g.n+"): ";c.append(b,g.dica);box.appendChild(c)}
+  DICAS.filter(d=>filtro==="Todas"||d[0]===filtro).forEach(([cat,t,itens],i)=>{
+    const det=document.createElement("details");if(i===0)det.open=true;
+    const s=document.createElement("summary");s.textContent=t;det.appendChild(s);
+    const ul=document.createElement("ul");itens.forEach(x=>{const li=document.createElement("li");li.textContent=x;ul.appendChild(li)});
+    det.appendChild(ul);box.appendChild(det)});
+}
+
+/* ================= Tela Objetivo ================= */
+function renderObjetivos(){
+  document.getElementById("objTitulo").textContent=S.goal?"Seu objetivo":"Qual é o seu objetivo?";
+  const box=document.getElementById("goals");box.innerHTML="";
+  GOALS.forEach(id=>{const g=OBJ[id];const b=document.createElement("button");b.type="button";b.className="goal";b.id="goal-"+id;
+    b.setAttribute("aria-pressed",S.goal===id);
+    b.innerHTML='<span class="ic" aria-hidden="true"></span><b></b><span></span><em></em>';
+    b.querySelector(".ic").textContent=g.ic;b.querySelector("b").textContent=g.n;b.querySelector("span:not(.ic)").textContent=g.d;b.querySelector("em").textContent=g.nivel;
+    b.onclick=()=>{const novo=S.goal!==id;S.goal=id;salvar();definirDescanso();
+      document.getElementById("objMsg").textContent=novo?"Pronto! Seu treino agora é "+g.n+". Seu progresso de cada objetivo fica guardado.":"";
+      atual=DIAS.includes(hoje)?hoje:"Seg";ir("treino")};
+    box.appendChild(b)});
+}
+
+/* ================= Cronômetro ================= */
+let dur=60,rest=60,fim=0,int=null;
+const tempo=document.getElementById("tempo"),ini=document.getElementById("iniciar");
+const fmt=s=>Math.floor(s/60)+":"+pad(s%60);
+function parar(){clearInterval(int);int=null;ini.textContent="Iniciar"}
+function tick(){rest=Math.max(0,Math.ceil((fim-Date.now())/1000));tempo.textContent=fmt(rest);
+  if(rest<=0){parar();tempo.textContent="Já!";rest=0;try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}}}
+function definirDescanso(){if(int)return;dur=rest=P().descanso;tempo.textContent=fmt(rest)}
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{parar();dur=rest=+b.dataset.s;tempo.textContent=fmt(rest)});
+ini.onclick=()=>{if(int){parar();return}if(rest<=0)rest=dur;fim=Date.now()+rest*1000;ini.textContent="Pausar";int=setInterval(tick,250)};
+
+/* ================= IA para dúvidas ================= */
+const painel=document.getElementById("painelIA"),chat=document.getElementById("chat"),pergunta=document.getElementById("pergunta"),
+      iaStatus=document.getElementById("iaStatus"),enviar=document.getElementById("enviarIA");
+let sample=null,iaPronta=false,iaOff=false,turnos=[],ctl=null,ultimoFoco=null;
+const SUGESTOES=["Como fazer a elevação pélvica certo?","Que lanche levar pro trabalho?","Posso treinar menstruada?","Minha academia não tem um aparelho. O que troco?"];
+function regras(){
+  const g=P(),d=g.dias[atual];
+  return "Você é a assistente de dúvidas do app Treina Ela, feito para mulheres na academia. Responda em português do Brasil, "+
+  "em no máximo 150 palavras, com linguagem simples, acolhedora e prática, sem emojis e sem markdown (use frases curtas e, se precisar, listas com hífen). "+
+  "Objetivo atual da usuária: "+g.n+" ("+g.d+"). Treino de "+atual+": "+d.t+" — "+d.ex.map(e=>e[0]+" "+e[1]).join("; ")+". "+
+  "Orientação de alimentação do app para esse objetivo: "+NUTRI[S.goal||"gluteo"].resumo+" "+
+  "Ajude com execução de exercícios, substituições de aparelhos, organização do treino, hábitos, descanso e alimentação em termos gerais. "+
+  "Não faça diagnósticos nem prescreva remédios, hormônios ou dietas muito restritivas. Para dor, lesão, gravidez, pós-parto ou problemas de saúde, "+
+  "oriente procurar médico e o professor da academia. Se a pergunta não tiver relação com treino, saúde ou bem-estar, diga gentilmente que só ajuda com esses temas.";
+}
+function addMsg(quem,txt){const m=document.createElement("div");m.className="msg "+quem;m.textContent=txt;chat.appendChild(m);chat.scrollTop=chat.scrollHeight;return m}
+function abrirIA(){
+  ultimoFoco=document.activeElement;painel.hidden=false;
+  if(!chat.children.length)addMsg("ia","Oi! Posso ajudar com dúvidas sobre os exercícios, o seu treino e alimentação. O que você quer saber?");
+  const sg=document.getElementById("sugs");sg.innerHTML="";
+  if(turnos.length===0&&!iaOff)SUGESTOES.forEach(s=>{const b=document.createElement("button");b.type="button";b.textContent=s;b.onclick=()=>{pergunta.value=s;perguntar()};sg.appendChild(b)});
+  if(!iaPronta&&!iaOff){iaStatus.textContent="Conectando…";enviar.disabled=true}
+  pergunta.focus();
+}
+function fecharIA(){ctl?.abort();painel.hidden=true;ultimoFoco?.focus?.()}
+document.getElementById("abrirIA").onclick=abrirIA;
+document.getElementById("fecharIA").onclick=fecharIA;
+painel.addEventListener("click",e=>{if(e.target===painel)fecharIA()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!painel.hidden)fecharIA()});
+function semIA(msg){iaPronta=false;iaOff=true;enviar.disabled=true;pergunta.disabled=true;iaStatus.textContent=msg;document.getElementById("sugs").innerHTML=""}
+const ERROS={rate_limited:"Muitas perguntas seguidas. Espere um pouco e tente de novo.",session_expired:"Sua sessão expirou. Entre de novo na sua conta Claude.",
+  refused:"Não consigo responder isso. Tente perguntar de outro jeito.",empty_completion:"Não veio resposta. Tente perguntar de outro jeito.",
+  prompt_too_large:"A conversa ficou longa demais. Feche e abra de novo para recomeçar."};
+async function perguntar(){
+  const txt=pergunta.value.trim();if(!txt||!iaPronta||ctl)return;
+  document.getElementById("sugs").innerHTML="";
+  addMsg("eu",txt);pergunta.value="";
+  turnos.push({role:"user",content:txt});if(turnos.length>12)turnos=turnos.slice(-12);
+  while(turnos.length&&turnos[0].role!=="user")turnos.shift();
+  const bolha=addMsg("ia","Pensando…");
+  ctl=new AbortController();enviar.textContent="Parar";enviar.type="button";enviar.onclick=()=>ctl?.abort();iaStatus.textContent="";
+  try{
+    const {text}=await sample([{role:"user",content:regras()},...turnos],{cache:false,signal:ctl.signal,modelTier:"quick",
+      onText:({text})=>{bolha.textContent=text.replace(/\*\*/g,"");chat.scrollTop=chat.scrollHeight}});
+    const limpo=text.replace(/\*\*/g,"");bolha.textContent=limpo;turnos.push({role:"assistant",content:limpo});
+  }catch(e){
+    const parcial=e&&e.text;
+    if(e&&(e.code==="not_granted"||e.code==="sampling_disabled"||e.code==="not_declared"||e.code==="capability_disabled"||e.code==="capability_removed")){
+      bolha.remove();turnos.pop();semIA("A IA não foi liberada neste aparelho. Você pode liberar nas permissões da página.");}
+    else if(e&&e.code==="cancelled"){if(parcial){bolha.textContent=parcial;turnos.push({role:"assistant",content:parcial})}else{bolha.remove();turnos.pop()}}
+    else{if(parcial){bolha.textContent=parcial;turnos.push({role:"assistant",content:parcial})}else{bolha.remove();turnos.pop()}
+      iaStatus.textContent=ERROS[e&&e.code]||"Não deu pra responder agora. Tente de novo em instantes."}
+  }finally{ctl=null;enviar.textContent="Enviar";enviar.type="submit";enviar.onclick=null;chat.scrollTop=chat.scrollHeight}
+}
+document.getElementById("formIA").addEventListener("submit",e=>{e.preventDefault();perguntar()});
+pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();perguntar()}});
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use){semIA("A IA funciona quando o app é aberto pelo link do Claude.");return}
+    sample=await window.claude.use("sample");
+    if(!sample){semIA("A IA funciona quando o app é aberto pelo link do Claude, com a conta conectada.");return}
+    iaPronta=true;enviar.disabled=false;pergunta.disabled=false;iaStatus.textContent="";
+  }catch(e){semIA("A IA não está disponível agora.")}
+})();
+
+/* ================= Meus dados ================= */
+const VERSAO="2.0.0";
+document.getElementById("versao").textContent=VERSAO;
+const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
+apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
+document.getElementById("naoApagar").onclick=()=>{confAp.hidden=true;apagar.hidden=false;apagar.focus()};
+document.getElementById("simApagar").onclick=()=>{
+  try{localStorage.removeItem(KEY)}catch(e){}
+  ctl?.abort();S=limpar(null);medEdit=null;medApagar=null;cargaApagar=null;
+  if(nuvem.ref){clearTimeout(nuvem.timer);S.atualizado=Date.now();enviarNuvem()}turnos=[];chat.innerHTML="";confAp.hidden=true;apagar.hidden=false;
+  ir("objetivo");document.getElementById("objMsg").textContent="Seus dados foram apagados. Escolha um objetivo para começar de novo.";
+};
+
+/* ================= Início ================= */
+document.documentElement.lang="pt-BR";
+function conferirData(){
+  const s=semanaId(),h=SEMANA_NOMES[new Date().getDay()];
+  if(s!==semana){semana=s;atual=DIAS.includes(h)?h:"Seg"}
+  hoje=h;if(tela==="treino")renderTreino();if(tela==="progresso")renderProgresso();
+}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){conferirData();puxarNuvem()}});
+setInterval(()=>{if(!document.hidden&&(semanaId()!==semana||SEMANA_NOMES[new Date().getDay()]!==hoje))conferirData()},60000);
+carregar();
+definirDescanso();
+ir(S.goal?"treino":"objetivo");
+requestAnimationFrame(loop);
+statusNuvem();iniciarNuvem();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+
+</body></html>

@@ -1,0 +1,8 @@
+testes/node_modules/
+testes/test-results/
+testes/playwright-report/
+testes/relatorio*/
+testes/capturas/
+testes/resultado*.json
+testes/resumo.json
+.DS_Store

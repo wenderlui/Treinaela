@@ -1,0 +1,23 @@
+// Treina Ela · regras de segurança do Cloud Firestore
+// © 2026 WR Lui. Todos os direitos reservados.
+// Cada pessoa só lê e grava o próprio documento, e só depois de confirmar o e-mail.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /usuarios/{uid} {
+      allow read, delete: if request.auth != null
+                          && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == uid
+                            && request.auth.token.email_verified == true
+                            && request.resource.data.keys().hasOnly(['v', 'atualizado', 's'])
+                            && request.resource.data.s is string
+                            && request.resource.data.s.size() < 500000
+                            && request.resource.data.atualizado is number;
+    }
+    // Qualquer outro caminho é bloqueado.
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}
