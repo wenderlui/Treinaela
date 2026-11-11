@@ -240,6 +240,13 @@ body.modo-boas{padding-bottom:32px}
 .ver-senha{position:absolute;right:4px;top:2px;min-height:44px;border:0;background:none;color:var(--accent-ink);font-weight:600;font-size:.84rem;cursor:pointer;padding:0 10px}
 .alerta{border-radius:12px;padding:10px 12px;font-size:.9rem;background:var(--accent-soft)}
 .alerta.ok{background:var(--stage);border-left:4px solid var(--done)}
+.alerta.verificar{display:flex;flex-direction:column;gap:8px;padding:14px}
+.alerta.verificar h4{margin:0;font-size:1.05rem;outline:none}
+.passos{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:2px}
+.esperando{margin:0;display:flex;align-items:center;gap:8px;color:inherit;font-weight:600}
+.esperando i{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);border-right-color:transparent;animation:gira 1s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.esperando i{animation:none}}
 .copy{font-size:.78rem;color:var(--muted);text-align:center;margin:0}
 .copy a{color:var(--accent-ink);display:inline-flex;align-items:center;min-height:44px;padding:0 6px;font-weight:600}
 /* Aviso de salvo */
@@ -333,7 +340,7 @@ body.modo-boas{padding-bottom:32px}
       <li>Treino e alimentação ajustados à fase do ciclo</li>
     </ul>
     <div class="card" id="boasLogin">
-      <h3>Entre na sua conta</h3>
+      <h3 id="boasLoginTit">Entre na sua conta</h3>
     </div>
     <div class="card">
       <h3>Ou use sem conta</h3>
@@ -510,6 +517,7 @@ body.modo-boas{padding-bottom:32px}
     <div class="card" id="contaCard" hidden>
       <div class="rot"><h3>Sua conta</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hConta" aria-label="Ajuda: sua conta"></button></div>
       <p class="ajuda-txt" id="hConta" hidden>A conta é opcional. Sem conta, tudo fica salvo só neste celular. Com conta, seus dados ficam guardados na nuvem e voltam se você trocar de celular ou reinstalar o app. Só você tem acesso aos seus dados.</p>
+      <div id="contaBloco">
       <div id="contaFora">
         <div class="form-conta">
           <p class="small muted" style="margin:0">Entre para salvar seus treinos na nuvem e usar em outros aparelhos.</p>
@@ -542,17 +550,23 @@ body.modo-boas{padding-bottom:32px}
       </div>
       <div id="contaDentro" hidden>
         <div class="conta-topo"><span class="avatar" id="contaAvatar" aria-hidden="true"></span><div class="quem"><b id="contaEmail"></b><span class="small muted" id="contaTipo"></span></div></div>
-        <div class="alerta" id="contaVerificar" hidden>
-          <p style="margin:0 0 8px"><b>Confirme seu e-mail.</b> Enviamos um link para <span id="contaEmail2"></span>. Abra o e-mail, toque no link e depois volte aqui. Olhe também a caixa de spam.</p>
+        <div class="alerta verificar" id="contaVerificar" hidden>
+          <h4 id="tituloVerificar" tabindex="-1">Confirme seu e-mail</h4>
+          <p style="margin:0">Enviamos um link de confirmação para <b id="contaEmail2"></b>.</p>
+          <ol class="passos"><li>Abra o seu e-mail (olhe também o spam).</li><li>Toque no <b>link de confirmação</b> que está no e-mail.</li><li>Volte para o app: o login termina sozinho.</li></ol>
+          <p class="small esperando" id="esperando"><i aria-hidden="true"></i>Esperando a confirmação…</p>
           <div class="linha"><button class="btn fill" type="button" id="jaConfirmei">Já confirmei</button><button class="btn" type="button" id="reenviar">Reenviar e-mail</button></div>
+          <button class="mini" type="button" id="outroEmail">Usar outro e-mail</button>
         </div>
-        <div class="linha"><button class="btn" type="button" id="sair">Sair</button><button class="mini perigo" type="button" id="excluirConta">Excluir minha conta</button></div>
+        <div class="alerta ok" id="contaOk" hidden><b>Login feito.</b> Seus dados ficam salvos na nuvem e voltam se você trocar de celular.</div>
+        <div class="linha" id="contaAcoes"><button class="btn" type="button" id="sair">Sair</button><button class="mini perigo" type="button" id="excluirConta">Excluir minha conta</button></div>
         <div class="confirma" id="confirmaExcluir" hidden>
           <p class="small" style="margin:0">Isso apaga sua conta e os dados guardados na nuvem. Os dados deste celular continuam aqui até você apagar em "Meus dados". Não dá para desfazer.</p>
           <div class="linha"><button class="btn fill" type="button" id="simExcluir">Excluir conta</button><button class="btn" type="button" id="naoExcluir">Cancelar</button></div>
         </div>
       </div>
-      <p class="msg-campo" id="contaMsg" role="status"></p>
+      <p class="msg-campo" id="contaMsg" role="status" aria-live="polite"></p>
+      </div>
     </div>
     <div class="card" id="meusDados">
       <h3>Meus dados</h3>
@@ -1013,9 +1027,9 @@ function ir(v){
   tela=v;
   for(const id of ["boas","treino","progresso","alimentacao","ciclo","dicas","objetivo"])document.getElementById("v-"+id).hidden=id!==v;
   document.body.classList.toggle("modo-boas",v==="boas");
-  const fora=document.getElementById("contaFora");
-  if(v==="boas")document.getElementById("boasLogin").appendChild(fora);
-  else if(fora.parentNode.id==="boasLogin")document.getElementById("contaCard").insertBefore(fora,document.getElementById("contaDentro"));
+  const bloco=document.getElementById("contaBloco");
+  if(v==="boas")document.getElementById("boasLogin").appendChild(bloco);
+  else if(bloco.parentNode.id==="boasLogin")document.getElementById("contaCard").appendChild(bloco);
   document.getElementById("subObjetivo").textContent=S.goal?OBJ[S.goal].n:"Escolha seu objetivo";
   const ativo=v==="dicas"?"objetivo":v;
   navBtns.forEach(b=>b.dataset.v===ativo?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
@@ -1292,7 +1306,22 @@ const CONTA=(()=>{
   const SDK="https://www.gstatic.com/firebasejs/10.12.2/";
   let auth=null,fs=null,usuario=null,carregando=null,cooldown=0;
   const $=id=>document.getElementById(id);
-  const msg=(t,ok)=>{const m=$("contaMsg");m.className="msg-campo"+(t?(ok?" ok":" erro"):"");m.textContent=t||""};
+  const msg=(t,ok)=>{const m=$("contaMsg");m.className="msg-campo"+(t?(ok?" ok":" erro"):"");m.textContent=t||"";
+    if(t&&m.offsetParent){const r=m.getBoundingClientRect();if(r.bottom>innerHeight-90||r.top<0)try{m.scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}}};
+  let vigia=null;
+  const voltar=()=>location.origin+location.pathname;
+  async function enviarConfirmacao(u){try{await u.sendEmailVerification({url:voltar(),handleCodeInApp:false})}catch(e){if(e&&e.code==="auth/unauthorized-continue-uri"||e&&e.code==="auth/invalid-continue-uri")await u.sendEmailVerification();else throw e}}
+  function pararVigia(){clearInterval(vigia);vigia=null;document.removeEventListener("visibilitychange",checar);removeEventListener("focus",checar)}
+  function vigiar(){if(vigia||!usuario||verificado(usuario))return;vigia=setInterval(checar,4000);document.addEventListener("visibilitychange",checar);addEventListener("focus",checar)}
+  let checando=false;
+  async function checar(manual){
+    if(checando||!usuario||(manual!==true&&document.hidden))return false;
+    checando=true;
+    try{await usuario.reload();usuario=auth.currentUser||usuario}catch(e){if(manual===true)throw e}finally{checando=false}
+    if(!usuario||!verificado(usuario))return false;
+    pararVigia();try{await usuario.getIdToken(true)}catch(e){}
+    msg("E-mail confirmado! Login feito.",true);toast("Login feito!");await mudou();return true;
+  }
   const ERROS={
     "auth/invalid-email":"Esse e-mail não parece certo. Confira se digitou tudo.",
     "auth/user-not-found":"E-mail ou senha incorretos.","auth/wrong-password":"E-mail ou senha incorretos.","auth/invalid-credential":"E-mail ou senha incorretos.","auth/invalid-login-credentials":"E-mail ou senha incorretos.",
@@ -1333,7 +1362,8 @@ const CONTA=(()=>{
   function verificado(u){return !!u&&(u.emailVerified||(u.providerData||[]).some(p=>p.providerId==="google.com"))}
   async function mudou(){
     render();
-    if(usuario&&tela==="boas"){sairBoas();if(!verificado(usuario))toast("Conta criada! Confirme seu e-mail (veja em Perfil)")}
+    if(usuario&&!verificado(usuario))vigiar();else pararVigia();
+    if(usuario&&verificado(usuario)&&tela==="boas"){sairBoas();toast("Login feito!")}
     if(usuario&&verificado(usuario)){
       const d=fs.collection("usuarios").doc(usuario.uid);
       nuvem.ref={get:async()=>{const x=await d.get();return {exists:x.exists,data:()=>x.data()}},set:v=>d.set(v)};
@@ -1348,9 +1378,12 @@ const CONTA=(()=>{
       $("contaAvatar").textContent=(em[0]||"?");
       const google=(usuario.providerData||[]).some(p=>p.providerId==="google.com");
       $("contaTipo").textContent=google?"Entrou com Google":verificado(usuario)?"E-mail confirmado":"E-mail ainda não confirmado";
-      $("contaVerificar").hidden=verificado(usuario);
+      const ok=verificado(usuario);
+      $("contaVerificar").hidden=ok;$("contaOk").hidden=!ok;$("contaAcoes").hidden=!ok;
     }
+    const t=$("boasLoginTit");if(t)t.hidden=!!usuario;
   }
+  function focarVerificar(){requestAnimationFrame(()=>{const h=$("tituloVerificar");if(h&&h.offsetParent){h.focus({preventScroll:true});try{h.scrollIntoView({block:"start",behavior:"smooth"})}catch(e){}}})}
   function aba(qual){["Entrar","Criar","Senha"].forEach(n=>{$("aba"+n).setAttribute("aria-selected",n===qual);$("form"+n).hidden=n!==qual});msg("")}
   async function acao(btn,fn){
     const b=btn;if(b.disabled)return;b.disabled=true;const t=b.textContent;b.textContent="Aguarde…";
@@ -1364,12 +1397,14 @@ const CONTA=(()=>{
     $("entrarGoogle").onclick=e=>acao(e.currentTarget,async()=>{
       const p=new window.firebase.auth.GoogleAuthProvider();
       try{await auth.signInWithPopup(p)}catch(x){if(x&&(x.code==="auth/popup-blocked"||x.code==="auth/operation-not-supported-in-this-environment"))await auth.signInWithRedirect(p);else throw x}
-      msg("Você entrou com Google.",true);toast("Conta conectada")});
+      if(auth.currentUser){msg("Login feito com Google.",true);toast("Login feito!")}});
     $("formEntrar").addEventListener("submit",e=>{e.preventDefault();
       const em=$("lEmail").value.trim(),se=$("lSenha").value;
       const a=erroCampo("lEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":""),b=erroCampo("lSenha",!se?"Digite sua senha.":"");
       if(!a||!b){(a?$("lSenha"):$("lEmail")).focus();return}
-      acao(e.submitter||$("formEntrar").querySelector("button[type=submit]"),async()=>{await auth.signInWithEmailAndPassword(em,se);$("lSenha").value="";msg("Você entrou.",true);toast("Conta conectada")})});
+      acao(e.submitter||$("formEntrar").querySelector("button[type=submit]"),async()=>{const r=await auth.signInWithEmailAndPassword(em,se);$("lSenha").value="";usuario=r.user;render();
+        if(verificado(usuario)){msg("Login feito.",true);toast("Login feito!")}
+        else{msg("Falta confirmar seu e-mail. Toque no link que enviamos.");vigiar();focarVerificar()}})});
     $("formCriar").addEventListener("submit",e=>{e.preventDefault();
       const em=$("cEmail").value.trim(),s1=$("cSenha").value,s2=$("cSenha2").value;
       const a=erroCampo("cEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":"");
@@ -1378,22 +1413,25 @@ const CONTA=(()=>{
       const d=$("cAceite").checked;if(!d){$("cAceiteErr").textContent="Para criar a conta, aceite os Termos e a Política de Privacidade.";$("cAceiteErr").hidden=false}
       if(!a||!b||!c||!d){const p=[["cEmail",a],["cSenha",b],["cSenha2",c]].find(x=>!x[1]);if(p)$(p[0]).focus();return}
       acao(e.submitter||$("formCriar").querySelector("button[type=submit]"),async()=>{
-        const r=await auth.createUserWithEmailAndPassword(em,s1);
-        try{await r.user.sendEmailVerification()}catch(x){}
-        cooldown=Date.now()+60000;$("cSenha").value="";$("cSenha2").value="";
-        usuario=r.user;render();msg("Conta criada! Confirme seu e-mail para começar a salvar na nuvem.",true)})});
+        let r;
+        try{r=await auth.createUserWithEmailAndPassword(em,s1)}
+        catch(x){if(x&&x.code==="auth/email-already-in-use"){aba("Entrar");$("lEmail").value=em;$("lSenha").focus()}throw x}
+        let enviado=true;try{await enviarConfirmacao(r.user)}catch(x){enviado=false}
+        cooldown=Date.now()+60000;$("cSenha").value="";$("cSenha2").value="";$("cAceite").checked=false;
+        usuario=r.user;render();vigiar();focarVerificar();
+        msg(enviado?"Conta criada! Agora confirme seu e-mail.":"Conta criada, mas o e-mail de confirmação não foi enviado. Toque em Reenviar e-mail.",enviado)})});
     $("formSenha").addEventListener("submit",e=>{e.preventDefault();
       const em=$("rEmail").value.trim();
       if(!erroCampo("rEmail",!em?"Digite seu e-mail.":!emailOk(em)?"Esse e-mail não parece certo.":"")){$("rEmail").focus();return}
       acao(e.submitter||$("formSenha").querySelector("button[type=submit]"),async()=>{
         try{await auth.sendPasswordResetEmail(em)}catch(x){if(!(x&&(x.code==="auth/user-not-found")))throw x}
         msg("Se existir uma conta com esse e-mail, você vai receber o link em alguns minutos. Olhe também o spam.",true)})});
-    $("jaConfirmei").onclick=e=>acao(e.currentTarget,async()=>{await usuario.reload();usuario=auth.currentUser;
-      if(verificado(usuario)){await usuario.getIdToken(true);msg("E-mail confirmado! Seus dados agora ficam salvos na nuvem.",true);await mudou()}
-      else msg("Ainda não aparece como confirmado. Toque no link do e-mail e tente de novo.")});
+    $("jaConfirmei").onclick=e=>acao(e.currentTarget,async()=>{
+      if(!await checar(true))msg("Ainda não aparece como confirmado. Toque no link do e-mail e tente de novo.")});
+    $("outroEmail").onclick=e=>acao(e.currentTarget,async()=>{pararVigia();await auth.signOut();usuario=null;render();aba("Criar");msg("");$("cEmail").focus()});
     $("reenviar").onclick=e=>{const falta=Math.ceil((cooldown-Date.now())/1000);if(falta>0){msg("Espere "+falta+" segundos para reenviar.");return}
-      acao(e.currentTarget,async()=>{await usuario.sendEmailVerification();cooldown=Date.now()+60000;msg("E-mail reenviado para "+usuario.email+".",true)})};
-    $("sair").onclick=e=>acao(e.currentTarget,async()=>{await auth.signOut();msg("Você saiu. Seus dados continuam neste celular.",true);toast("Você saiu da conta")});
+      acao(e.currentTarget,async()=>{await enviarConfirmacao(usuario);cooldown=Date.now()+60000;msg("E-mail reenviado para "+usuario.email+".",true)})};
+    $("sair").onclick=e=>acao(e.currentTarget,async()=>{pararVigia();await auth.signOut();msg("Você saiu. Seus dados continuam neste celular.",true);toast("Você saiu da conta")});
     $("excluirConta").onclick=()=>{$("confirmaExcluir").hidden=false;$("excluirConta").hidden=true;$("naoExcluir").focus()};
     $("naoExcluir").onclick=()=>{$("confirmaExcluir").hidden=true;$("excluirConta").hidden=false};
     $("simExcluir").onclick=e=>acao(e.currentTarget,async()=>{
@@ -1814,7 +1852,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="2.1.0";
+const VERSAO="2.2.0";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
