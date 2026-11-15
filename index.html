@@ -1412,7 +1412,7 @@ function lerCores(){const cs=getComputedStyle(document.documentElement),v=k=>cs.
 let f3dCor="",pula3d=false,custo3d=0,lento3d=0;
 function desenharQualquer(d){
   const F=window.Figura3D;
-  if(F&&F.tem(d.pz)&&!d.sem3d){
+  if(F&&F.tem(d.pz)&&!d.sem3d&&(!F.pronto||F.pronto())){
     if(f3dCor!==cor.top){F.cores({top:cor.top});f3dCor=cor.top}
     const ini=performance.now();
     if(F.desenhar(d,d.t)){custo3d=custo3d*.9+(performance.now()-ini)*.1;
@@ -1422,8 +1422,12 @@ function desenharQualquer(d){
   }
   desenhar(d,d.t,cor);
 }
+let aqueceu=false;
 function loop(agora){
   const dt=Math.min(agora-ult,100);ult=agora;
+  if(!aqueceu&&window.Figura3D&&Figura3D.aquecer){aqueceu=true;
+    const vai=()=>Figura3D.aquecer().then(ok=>{if(ok)demos.forEach(x=>{x.desenhado=false})});
+    if(window.requestIdleCallback)requestIdleCallback(vai,{timeout:1500});else setTimeout(vai,600)}
   if(tela==="treino"){
     if(!cor||quadro++%60===0)lerCores();
     pula3d=custo3d>14&&!pula3d; // aparelho lento: 3D a 30 quadros por segundo
@@ -2127,7 +2131,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="3.2.0";
+const VERSAO="3.2.1";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};

@@ -735,5 +735,21 @@
     const set = (m, v) => { if (v) m.color.set(v); };
     set(M.pele, c.pele); set(M.top, c.top); set(M.legging, c.legging); set(M.cabelo, c.cabelo); set(M.tenis, c.tenis);
   }
-  window.Figura3D = { desenhar, tem: n => !desligado && !!EX[n], desligar: () => { desligado = true; }, cores, EX, _int: { aplicar, mix, criarFigura, info: () => fig && { tris: fig.tris, ms: fig.tempo } } };
+  // aquece em segundo plano: monta o corpo e compila os shaders sem travar a tela de treino
+  let pronto = false, aquecendo = null;
+  function aquecer() {
+    if (aquecendo) return aquecendo;
+    aquecendo = new Promise(res => setTimeout(res, 0)).then(async () => {
+      if (!iniciar()) return false;
+      for (const n of Object.keys(EX)) preparar(n);
+      for (const n in cache) { cache[n].grupo.visible = true; cache[n].extras.forEach(o => { o.visible = true; }); }
+      try { if (rend.compileAsync) await rend.compileAsync(cena, cam); else rend.compile(cena, cam); } catch (e) {}
+      for (const n in cache) { cache[n].grupo.visible = false; cache[n].extras.forEach(o => { o.visible = false; }); }
+      const cv = document.createElement("canvas"); cv.width = 200; cv.height = 140;
+      desenhar({ cv, ctx: cv.getContext("2d"), nome: "squat" }, .5);
+      pronto = true; return true;
+    }).catch(() => false);
+    return aquecendo;
+  }
+  window.Figura3D = { desenhar, aquecer, pronto: () => pronto && !desligado, tem: n => !desligado && !!EX[n], desligar: () => { desligado = true; }, cores, EX, _int: { aplicar, mix, criarFigura, info: () => fig && { tris: fig.tris, ms: fig.tempo } } };
 })();
