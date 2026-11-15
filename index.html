@@ -14,6 +14,8 @@
 <link rel="icon" href="icons/icon-192.png">
 <style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <script src="firebase-config.js"></script>
+<script src="vendor/three.min.js" defer></script>
+<script src="figura3d.js" defer></script>
 <title>Treina Ela</title>
 <meta name="author" content="WR Lui">
 <meta name="copyright" content="© 2026 WR Lui. Todos os direitos reservados.">
@@ -1270,7 +1272,7 @@ function renderTreino(){
     }
     lista.appendChild(el);
     const cv=el.querySelector("canvas");cv.setAttribute("aria-label","Animação do movimento: "+n);
-    const d={cv,ctx:cv.getContext("2d"),p:POSES[pz],pz,off:i*.17,pausa:reduz,t:reduz?1:.5};
+    const d={cv,ctx:cv.getContext("2d"),p:POSES[pz],pz,nome:pz,off:i*.17,pausa:reduz,t:reduz?1:.5};
     const tog=()=>{d.pausa=!d.pausa};cv.onclick=tog;cv.onkeydown=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();tog()}};
     demos.push(d);if(obs)obs.observe(cv);else d.vis=true;
   });
@@ -1295,7 +1297,7 @@ function atualizarSemana(){
   document.getElementById("semMsg").textContent=!salvaOk?"Seu navegador não está salvando os dados. Saia da aba anônima para eles ficarem guardados."
     :f===tot?"Semana completa! Parabéns, segunda começa uma nova.":diasOk+" de 5 dias concluídos · "+f+" de "+tot+" exercícios";
 }
-function dimensionar(){const dpr=window.devicePixelRatio||1;demos.forEach(d=>{const w=d.cv.clientWidth||300;d.cv.width=Math.round(w*dpr);d.cv.height=Math.round(w*.7*dpr)})}
+function dimensionar(){const dpr=Math.min(window.devicePixelRatio||1,2);demos.forEach(d=>{const w=d.cv.clientWidth||300;d.cv.width=Math.round(w*dpr);d.cv.height=Math.round(w*.7*dpr)})}
 addEventListener("resize",dimensionar);
 
 /* ===== Figura com volume: articulações giram (não encurtam), pé ou mão apoiados ficam parados ===== */
@@ -1406,12 +1408,28 @@ let ult=performance.now(),cor=null,quadro=0;
 function lerCores(){const cs=getComputedStyle(document.documentElement),v=k=>cs.getPropertyValue(k).trim();
   cor={pele:v("--fig-skin"),pele2:v("--fig-skin-2"),cabelo:v("--fig-hair"),top:v("--accent"),legging:v("--fig-legs"),legging2:v("--fig-legs-2"),
     tenis:v("--fig-shoe"),tenis2:v("--fig-shoe-2"),sola:v("--fig-sole"),metal:v("--eq-metal"),pad:v("--eq-pad"),chao:v("--floor"),chao2:v("--floor-2"),chaoLinha:v("--floor-line"),brilho:v("--glow")}}
+// 3D quando o aparelho permite (figura3d.js); senão, o desenho 2D
+let f3dCor="",pula3d=false,custo3d=0,lento3d=0;
+function desenharQualquer(d){
+  const F=window.Figura3D;
+  if(F&&F.tem(d.pz)&&!d.sem3d){
+    if(f3dCor!==cor.top){F.cores({top:cor.top});f3dCor=cor.top}
+    const ini=performance.now();
+    if(F.desenhar(d,d.t)){custo3d=custo3d*.9+(performance.now()-ini)*.1;
+      if(custo3d>40&&++lento3d>20){F.desligar();demos.forEach(x=>{x.desenhado=false})} // aparelho muito lento: volta ao 2D
+      return}
+    d.sem3d=true;
+  }
+  desenhar(d,d.t,cor);
+}
 function loop(agora){
   const dt=Math.min(agora-ult,100);ult=agora;
   if(tela==="treino"){
     if(!cor||quadro++%60===0)lerCores();
-    demos.forEach(d=>{const cic=CICLICO.has(d.pz);if(!d.pausa){d.ph=((d.ph??d.off)+dt/(cic?1500:3600))%1;d.t=ritmo(d.ph,cic)}
-      if(d.vis!==false||!d.desenhado){desenhar(d,d.t,cor);d.desenhado=true}});
+    pula3d=custo3d>14&&!pula3d; // aparelho lento: 3D a 30 quadros por segundo
+    demos.forEach(d=>{const e3=window.Figura3D&&Figura3D.EX[d.pz],cic=e3?!!e3.ciclico:CICLICO.has(d.pz);
+      if(!d.pausa){d.ph=((d.ph??d.off)+dt/(e3?(e3.periodo||3600):(cic?1500:3600)))%1;d.t=e3&&cic?d.ph:ritmo(d.ph,cic)}
+      if((d.vis!==false&&!(pula3d&&e3))||!d.desenhado){desenharQualquer(d);d.desenhado=true}});
   }
   requestAnimationFrame(loop);
 }
@@ -2109,7 +2127,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="3.0.0";
+const VERSAO="3.1.0";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
