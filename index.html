@@ -17,21 +17,21 @@
 <title>Treina Ela</title>
 <meta name="author" content="WR Lui">
 <meta name="copyright" content="© 2026 WR Lui. Todos os direitos reservados.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Figtree:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Figtree:wght@400;600;700;800&display=swap">
 <style>
 /* Layout: app de uma coluna. Cabeçalho com objetivo e botão de IA, quatro telas (Treino, Progresso, Dicas, Objetivo) e barra de navegação fixa embaixo */
 :root{
   --bg:#f7f4f6; --surface:#ffffff; --fg:#231a21; --muted:#7a6a75; --line:#e7dde3;
-  --accent:#d6336c; --accent-soft:#fbe3ec; --accent-ink:#a3194a; --on-accent:#ffffff; --on-done:#ffffff; --done-ink:#1d6e47; --done:#2f9e6b; --stage:#f3edf1; --warn:#b7791f;
+  --accent:#d6336c; --accent-soft:#fbe3ec; --accent-ink:#a3194a; --on-accent:#ffffff; --on-done:#ffffff; --done-ink:#1d6e47; --done:#2f9e6b; --stage:#f3edf1; --warn:#b7791f; --water:#155f9e; --water-2:#1a73b8; --on-water:#ffffff; --water-soft:#e2f0fb; --water-ink:#1b6fae; --fig-skin:#e8b392; --fig-skin-2:#cf9473; --fig-hair:#3b2620; --fig-legs:#2f3346; --fig-legs-2:#202333; --fig-shoe:#ffffff; --fig-shoe-2:#d9dbe3; --fig-sole:#9aa0b0; --eq-metal:#8f98ab; --eq-pad:#3b4054; --floor:#ece4ea; --floor-2:#f5f0f3; --floor-line:#d9ccd5; --glow:rgba(214,51,108,.38);
   --display:"Barlow Condensed","Arial Narrow",sans-serif;
   --body:"Figtree",system-ui,-apple-system,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#17121a; --surface:#221b25; --fg:#f4ecf1; --muted:#a898a3; --line:#352a38;
-  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; color-scheme:dark}}
+  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; --water:#3ea2ec; --water-2:#69c2f5; --on-water:#04223a; --water-soft:#16283a; --water-ink:#7cc4f7; --fig-skin:#e3a985; --fig-skin-2:#b78063; --fig-hair:#6e4636; --fig-legs:#5d6482; --fig-legs-2:#40465f; --fig-shoe:#f0f1f5; --fig-shoe-2:#b9bdc9; --fig-sole:#7c8295; --eq-metal:#8d96aa; --eq-pad:#4b5169; --floor:#2b2331; --floor-2:#231c28; --floor-line:#3a2f40; --glow:rgba(255,92,147,.42); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17121a; --surface:#221b25; --fg:#f4ecf1; --muted:#a898a3; --line:#352a38;
-  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; color-scheme:dark}
+  --accent:#ff5c93; --accent-soft:#3a1f2c; --accent-ink:#ff8fb4; --on-accent:#2a0a17; --on-done:#0d2419; --done-ink:#7ddcae; --done:#4cc28d; --stage:#1b151e; --warn:#e0a84a; --water:#3ea2ec; --water-2:#69c2f5; --on-water:#04223a; --water-soft:#16283a; --water-ink:#7cc4f7; --fig-skin:#e3a985; --fig-skin-2:#b78063; --fig-hair:#6e4636; --fig-legs:#5d6482; --fig-legs-2:#40465f; --fig-shoe:#f0f1f5; --fig-shoe-2:#b9bdc9; --fig-sole:#7c8295; --eq-metal:#8d96aa; --eq-pad:#4b5169; --floor:#2b2331; --floor-2:#231c28; --floor-line:#3a2f40; --glow:rgba(255,92,147,.42); color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 150px}
 body.sem-timer{padding-bottom:96px}
@@ -131,9 +131,24 @@ details li{font-size:.92rem}
 .filtros button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
 /* Progresso */
-.agua{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.agua button{height:52px;border:2px solid var(--line);border-radius:8px 8px 14px 14px;background:transparent;cursor:pointer;position:relative;overflow:hidden;padding:0}
-.agua button.cheio{border-color:#3b8ed0;background:linear-gradient(to top,#3b8ed0 70%,transparent 70%)}
+.agua-painel{display:flex;flex-direction:column;gap:10px}
+.agua-num{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.agua-num b{font-size:2rem;font-weight:800;letter-spacing:-.02em;color:var(--water-ink);font-variant-numeric:tabular-nums;line-height:1}
+.agua-num span{color:var(--muted);font-size:.92rem}
+.agua-bar{height:10px;border-radius:99px;background:var(--water-soft);overflow:hidden}
+.agua-bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--water),var(--water-2));transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.agua-acoes{display:grid;grid-template-columns:56px 1fr;gap:10px}
+.agua-acoes button{min-height:52px;border-radius:16px;border:0;cursor:pointer;font-weight:700;font-size:1rem}
+.agua-menos{background:var(--water-soft);color:var(--water-ink);font-size:1.5rem!important}
+.agua-menos:disabled{opacity:.45;cursor:default}
+.agua-mais{background:linear-gradient(135deg,var(--water),var(--water-2));box-shadow:0 6px 16px -6px var(--water)}
+.agua-mais small{font-weight:600;opacity:.9;margin-left:4px}
+.agua{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px}
+.agua button{aspect-ratio:4/5;min-height:48px;border:2px solid var(--water-soft);border-radius:6px 6px 12px 12px;background:transparent;cursor:pointer;position:relative;overflow:hidden;padding:0}
+.agua button::before{content:"";position:absolute;inset:auto 0 0;height:0;background:linear-gradient(to top,var(--water),var(--water-2));transition:height .35s cubic-bezier(.2,.8,.2,1)}
+.agua button.cheio{border-color:var(--water)}
+.agua button.cheio::before{height:78%}
+
 .hist{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;align-items:end;height:90px}
 .hist div{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .hist i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px}
@@ -313,6 +328,101 @@ body.modo-boas{padding-bottom:32px}
 .pill{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--fase);color:#fff}
 .tag.mod{background:var(--stage);color:var(--fg)}
 @media (prefers-reduced-motion:reduce){.bar i,.switch i,.switch i::after{transition:none}}
+/* ================= Visual 3.0: cartões com profundidade, tipografia limpa, barra flutuante ================= */
+:root{--accent-2:#f06595;--accent-deep:#a3194a;--hero-1:#d6336c;--hero-2:#9c1747;--done-1:#1f7a52;--done-2:#135a3a;
+  --card-line:rgba(60,20,45,.07);--shadow-sm:0 1px 2px rgba(60,20,45,.06);--shadow:0 1px 2px rgba(60,20,45,.05),0 12px 28px -16px rgba(60,20,45,.22);
+  --glass:rgba(255,255,255,.82);--stage-hi:#ffffff;--input:#faf7f9;--r:20px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent-2:#ff8cb0;--accent-deep:#d9487d;--hero-1:#a8245a;--hero-2:#64123a;--done-1:#1d6e4a;--done-2:#0f4430;
+  --card-line:rgba(255,255,255,.06);--shadow-sm:0 1px 0 rgba(255,255,255,.03);--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -18px rgba(0,0,0,.7);
+  --glass:rgba(30,24,34,.84);--stage-hi:#2c2432;--input:#1a151d}}
+:root[data-theme="dark"]{--accent-2:#ff8cb0;--accent-deep:#d9487d;--hero-1:#a8245a;--hero-2:#64123a;--done-1:#1d6e4a;--done-2:#0f4430;
+  --card-line:rgba(255,255,255,.06);--shadow-sm:0 1px 0 rgba(255,255,255,.03);--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -18px rgba(0,0,0,.7);
+  --glass:rgba(30,24,34,.84);--stage-hi:#2c2432;--input:#1a151d}
+body{padding-bottom:180px;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body.sem-timer{padding-bottom:116px}
+.wrap{gap:20px}
+h2{font-family:var(--body);font-weight:800;text-transform:none;letter-spacing:-.025em;font-size:1.7rem;line-height:1.15}
+h3{font-family:var(--body);font-weight:700;text-transform:none;letter-spacing:-.01em;font-size:1.08rem}
+.sub{font-weight:600}
+.card,.ex,details,.goal,.ref{border:1px solid var(--card-line);border-radius:var(--r);box-shadow:var(--shadow);background:var(--surface)}
+.card{padding:18px;gap:12px}
+.ex{padding:16px;gap:14px;transition:opacity .25s}
+.ex.done{opacity:.72}
+.view:not([hidden]){animation:entra .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes entra{from{transform:translateY(10px)}to{transform:none}}
+/* cartão da semana em destaque */
+.semana{background:linear-gradient(135deg,var(--hero-1),var(--hero-2));border:0;color:#fff;box-shadow:0 18px 34px -18px var(--hero-1);position:relative;overflow:hidden}
+.semana::after{content:"";position:absolute;right:-40px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);pointer-events:none}
+.semana .sem-top,.semana .sem-top b,.semana .muted{color:#fff}
+.semana .sem-top b{font:800 2rem var(--body);letter-spacing:-.03em}
+.semana .bar{background:rgba(255,255,255,.25);height:10px}
+.semana .bar i{background:#fff}
+.semana.completa{background:linear-gradient(135deg,var(--done-1),var(--done-2));box-shadow:0 18px 34px -18px var(--done-1)}
+.semana.completa .sem-top b{color:#fff}.semana.completa .bar i{background:#fff}
+.bar{height:10px;background:var(--accent-soft)}
+.bar i{background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+/* botões */
+.btn{border-radius:14px;font-weight:700;transition:transform .12s,box-shadow .2s,background-color .2s}
+.btn:active,.agua-acoes button:active,.chk:active,.tabs button:active,nav.menu button:active{transform:scale(.96)}
+.btn.fill{background:linear-gradient(135deg,var(--accent),var(--accent-deep));border-color:transparent;box-shadow:0 10px 20px -12px var(--accent)}
+.ia-btn{border:0;background:var(--accent-soft);box-shadow:var(--shadow-sm)}
+/* dias da semana */
+.tabs{gap:8px}
+.tabs button{border:1px solid var(--card-line);border-radius:16px;box-shadow:var(--shadow-sm);min-height:54px;transition:transform .12s,background .2s}
+.tabs button[aria-selected="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-deep));border-color:transparent;box-shadow:0 10px 18px -10px var(--accent)}
+.tabs button.ok::after{top:4px;right:7px}
+/* exercício */
+.demo{border-radius:16px;background:radial-gradient(120% 90% at 50% 0%,var(--stage-hi),var(--stage))}
+.chk{transition:background .2s,border-color .2s,transform .12s}
+.ex.done .chk,.ref.feita .chk{animation:pop .38s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.tag{background:var(--accent-soft);font-weight:700}
+.step{border:1px solid var(--card-line);border-radius:14px;box-shadow:var(--shadow-sm)}
+.step button{background:var(--input)}
+/* campos */
+.campo input,.campo select,.form input,.peso-linha input,.form-conta .campo input{background-color:var(--input);border-radius:14px;border-color:var(--line);transition:border-color .2s,box-shadow .2s}
+.campo input:focus,.campo select:focus,.form input:focus,.peso-linha input:focus,.form-conta .campo input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);outline:none}
+/* objetivos */
+.goal{border-width:2px;border-color:transparent;transition:transform .12s,box-shadow .2s}
+.goal .ic{background:linear-gradient(135deg,var(--accent),var(--accent-deep));border-radius:14px;font-family:var(--body)}
+.goal[aria-pressed="true"]{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 4px var(--accent-soft),var(--shadow)}
+.goal[aria-pressed="true"] span:not(.ic){color:var(--muted)}
+/* metas, refeições, progresso */
+.meta{border-radius:16px;background:var(--stage)}
+.meta b{font-family:var(--body);letter-spacing:-.03em}
+.ref.feita{background:var(--surface)}
+.hist i{background:linear-gradient(to top,var(--accent),var(--accent-2));border-radius:8px 8px 3px 3px}
+.hist i.cheia{background:linear-gradient(to top,var(--done),#5fd39f)}
+.abas{border-radius:14px}
+.abas button{border-radius:11px}
+.btn-google{border-radius:14px;box-shadow:var(--shadow-sm)}
+/* cronômetro + menu numa barra flutuante de vidro */
+.fixo{left:max(10px,calc(50% - 290px));right:max(10px,calc(50% - 290px));bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:0 10px;
+  border:1px solid var(--card-line);border-radius:26px;background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 18px 40px -16px rgba(40,10,30,.4)}
+.timer{border-bottom:1px solid var(--card-line);padding:10px 4px}
+.timer .t{font-family:var(--body);letter-spacing:-.03em}
+.timer .btn{border-radius:12px}
+.timer .btn[data-s][aria-pressed="true"]{background:var(--accent-soft)}
+nav.menu button{isolation:isolate;position:relative;min-height:60px;padding-top:9px;transition:color .2s}
+nav.menu button::before{content:"";position:absolute;top:5px;left:50%;width:54px;height:32px;margin-left:-27px;border-radius:99px;background:var(--accent-soft);z-index:-1;transform:scale(.4);opacity:0;transition:transform .25s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+nav.menu button[aria-current="page"]::before{transform:scale(1);opacity:1}
+nav.menu button[aria-current="page"]{color:var(--accent-ink)}
+/* aviso de salvo */
+.toast{border-radius:16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:desce .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 28px -10px rgba(0,0,0,.45)}
+@keyframes desce{from{transform:translate(-50%,-14px)}to{transform:translateX(-50%)}}
+.sheet{border-radius:26px 26px 0 0}
+.painel{-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.fase-top b{font:800 1.06rem var(--body);text-transform:none;letter-spacing:-.01em}
+.semana-c .fase-top b{font-size:.98rem}
+.fase-banner,.semana-c{border-left-width:4px}
+.semana-c{border-radius:16px;border-color:var(--card-line)}
+.chips button{border-color:var(--card-line);box-shadow:var(--shadow-sm);transition:background .2s,transform .12s}
+.chips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:var(--on-accent);border-color:transparent}
+.modo{border-radius:14px}
+.timer .t,.pct,.meta b,.avatar{font-family:var(--body)}
+.agua-mais{color:var(--on-water)}
+@media (prefers-reduced-motion:reduce){.view:not([hidden]),.toast,.ex.done .chk,.ref.feita .chk{animation:none}.bar i,.agua-bar i,.agua button::before{transition:none}}
 </style>
 
 </head><body>
@@ -379,10 +489,17 @@ body.modo-boas{padding-bottom:32px}
       <div class="hist" id="hist"></div>
     </div>
     <div class="card">
-      <div class="rot"><h3>Água hoje</h3><b id="aguaTxt" style="font:800 1.2rem var(--display);color:#2f7fbf;margin-left:auto">0 ml</b><button class="ajuda" type="button" aria-expanded="false" aria-controls="hAgua" aria-label="Ajuda: água"></button></div>
-      <p class="ajuda-txt" id="hAgua" hidden>Toque em um copo cada vez que beber 250 ml (um copo americano cheio). Tocou errado? Toque no último copo cheio para desmarcar. A meta usa seu peso: cerca de 35 ml por quilo.</p>
-
-      <div class="agua" id="agua"></div>
+      <div class="rot"><h3>Água hoje</h3><button class="ajuda" type="button" aria-expanded="false" aria-controls="hAgua" aria-label="Ajuda: água" style="margin-left:auto"></button></div>
+      <p class="ajuda-txt" id="hAgua" hidden>Toque em <b>+1 copo</b> cada vez que beber 250 ml (um copo americano cheio). Marcou a mais? Toque em <b>−</b>. Também dá para tocar num copo vazio para encher até ele. A meta usa seu peso: cerca de 35 ml por quilo. Fica salvo na hora.</p>
+      <div class="agua-painel">
+        <div class="agua-num"><b id="aguaTxt">0 ml</b><span id="aguaDe"></span></div>
+        <div class="agua-bar" aria-hidden="true"><i id="aguaBarra"></i></div>
+        <div class="agua-acoes">
+          <button class="agua-menos" type="button" id="aguaMenos" aria-label="Tirar um copo">−</button>
+          <button class="agua-mais" type="button" id="aguaMais">+1 copo <small>250 ml</small></button>
+        </div>
+      </div>
+      <div class="agua" id="agua" role="group" aria-label="Copos de hoje"></div>
       <p class="small muted" id="aguaMeta" style="margin:0">Cada copo é 250 ml.</p>
     </div>
     <div class="card">
@@ -625,7 +742,7 @@ function pose(a,b,m,props,floor){const A=parse(a),B={...A,...parse(b)};return{A:
 const R=(c,x,y,w,h)=>c.fillRect(x,y,w,h);
 const Ln=(c,a,b,x2,y2)=>{c.beginPath();c.moveTo(a,b);c.lineTo(x2,y2);c.stroke()};
 const Ci=(c,x,y,r)=>{c.beginPath();c.arc(x,y,r,0,7);c.fill()};
-const halter=(c,q)=>{c.save();c.lineWidth=7;Ln(c,q.x-8,q.y,q.x+8,q.y);c.restore()};
+const halter=(c,q)=>{c.save();c.lineWidth=2.2;Ln(c,q.x-9,q.y,q.x+9,q.y);c.fillStyle=c.fillStyle;[-9,-6.5,6.5,9].forEach((o,i)=>{c.beginPath();c.roundRect?c.roundRect(q.x+o-1.6,q.y-(i%3?5.5:4.5),3.2,i%3?11:9,1.2):c.rect(q.x+o-1.6,q.y-5,3.2,10);c.fill()});c.restore()};
 const POSES={
   squat:pose("H100,22 S100,38 P100,72 K104,98 F100,124 E112,50 W124,46","H116,52 S110,66 P84,90 K114,96 F102,124 E126,72 W138,68","P"),
   thrust:pose("H54,72 S66,80 P92,112 K124,90 F142,124 E80,102 W94,106","H52,74 S66,80 P104,84 K134,86 F142,124 E84,88 W102,82","P",
@@ -909,10 +1026,10 @@ const num=(v,min,max)=>{v=Number(v);return Number.isFinite(v)&&v>=min&&v<=max?Ma
 const isDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
 let salvaOk=true;
 const CICLO0=()=>({inicio:"",dur:28,menst:5,ajustar:true});
-let S={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0,vistoBoas:0};
+let S={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},descanso:null,atualizado:0,vistoBoas:0};
 
 function limpar(o){
-  const n={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},atualizado:0,vistoBoas:0};
+  const n={goal:null,semanas:{},cargas:{},medidas:[],agua:{},ciclo:CICLO0(),peso:null,refeicoes:{},sintomas:{},normal:{},descanso:null,atualizado:0,vistoBoas:0};
   if(o&&o.vistoBoas===1)n.vistoBoas=1;
   if(!o||typeof o!=="object"||Array.isArray(o))return n;
   if(GOALS.includes(o.goal))n.goal=o.goal;
@@ -934,6 +1051,7 @@ function limpar(o){
   if(o.sintomas&&typeof o.sintomas==="object")for(const k in o.sintomas){if(isDate(k)&&SINTOMAS.some(x=>x[0]===o.sintomas[k]))n.sintomas[k]=o.sintomas[k]}
   if(o.normal&&typeof o.normal==="object")for(const k in o.normal){if(isDate(k)&&o.normal[k]===1)n.normal[k]=1}
   n.peso=num(o.peso,30,300);
+  if([30,60,90,120].includes(o.descanso))n.descanso=o.descanso;
   n.atualizado=num(o.atualizado,0,1e15)||0;
   n.medidas.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
   // peso único: o peso da Nutrição vira uma medida
@@ -1011,6 +1129,7 @@ function mesclar(a,b){
   const dias=new Set(r.medidas.map(m=>m.d));velho.medidas.forEach(m=>{if(!dias.has(m.d))r.medidas.push(m)});
   r.medidas.sort((x,y)=>x.d<y.d?-1:1);
   if(!r.goal)r.goal=velho.goal;
+  if(!r.descanso)r.descanso=velho.descanso;
   if(!r.ciclo.inicio&&velho.ciclo.inicio)r.ciclo=velho.ciclo;
   r.vistoBoas=1;
   return r;
@@ -1142,13 +1261,16 @@ function renderTreino(){
       menos.onclick=()=>muda(-1);mais.onclick=()=>muda(1);
       inp.onchange=()=>{const t=inp.value.trim();if(t===""){mostra();return}
         const v=lerNum(t);if(v===null||v<0||v>500){mostra();info.textContent="Use um número de 0 a 500";return}
-        if(v===ultimaCarga(n)){mostra();return}
+        clearTimeout(tDig);if(v===ultimaCarga(n)){mostra();if(inp.dataset.dig){delete inp.dataset.dig;toast("Carga salva: "+fmtN(v)+" kg")}return}
         gravarCarga(n,v);mostra();atualiza();toast("Carga salva: "+fmtN(v)+" kg")};
       inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();inp.blur()}};
+      let tDig=null;
+      inp.oninput=()=>{const v=lerNum(inp.value.trim()); // salva enquanto digita: fechar o app de repente não perde nada
+        if(v===null||v<0||v>500||v===ultimaCarga(n))return;gravarCarga(n,v);atualiza();inp.dataset.dig="1"};
     }
     lista.appendChild(el);
     const cv=el.querySelector("canvas");cv.setAttribute("aria-label","Animação do movimento: "+n);
-    const d={cv,ctx:cv.getContext("2d"),p:POSES[pz],off:i*.17,pausa:reduz,t:.5};
+    const d={cv,ctx:cv.getContext("2d"),p:POSES[pz],pz,off:i*.17,pausa:reduz,t:reduz?1:.5};
     const tog=()=>{d.pausa=!d.pausa};cv.onclick=tog;cv.onkeydown=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();tog()}};
     demos.push(d);if(obs)obs.observe(cv);else d.vis=true;
   });
@@ -1176,32 +1298,120 @@ function atualizarSemana(){
 function dimensionar(){const dpr=window.devicePixelRatio||1;demos.forEach(d=>{const w=d.cv.clientWidth||300;d.cv.width=Math.round(w*dpr);d.cv.height=Math.round(w*.7*dpr)})}
 addEventListener("resize",dimensionar);
 
+/* ===== Figura com volume: articulações giram (não encurtam), pé ou mão apoiados ficam parados ===== */
+const ARV=[["S","P"],["H","S"],["E","S"],["W","E"],["e","S"],["w","e"],["K","P"],["F","K"],["k","P"],["f","k"]];
+const CICLICO=new Set(["walk","bike","jack","bandwalk"]),DE_FRENTE=new Set(["abd","press","lateral","jack","bandwalk"]);
+function prepPose(p){
+  if(p.rig)return;const A=p.A,B=p.B;
+  p.rig=ARV.map(([c,pa])=>{const a={x:A[c].x-A[pa].x,y:A[c].y-A[pa].y},b={x:B[c].x-B[pa].x,y:B[c].y-B[pa].y};
+    const aa=Math.atan2(a.y,a.x);let da=Math.atan2(b.y,b.x)-aa;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;
+    return{c,pa,aa,da,la:Math.hypot(a.x,a.y),lb:Math.hypot(b.x,b.y)}});
+  let anc=null,bd=1e9;for(const k of ["F","f","W","w"]){const d=Math.hypot(B[k].x-A[k].x,B[k].y-A[k].y);if(d<bd){bd=d;anc=k}}
+  p.anc=bd<4?anc:null;
+  const u={x:A.S.x-A.P.x,y:A.S.y-A.P.y},pr={x:-u.y,y:u.x},v={x:(A.W.x-A.S.x)+(A.K.x-A.P.x)*1.5,y:(A.W.y-A.S.y)+(A.K.y-A.P.y)*1.5};
+  p.lado=(pr.x*v.x+pr.y*v.y)>=0?1:-1;
+}
+function posar(p,t){
+  prepPose(p);const A=p.A,B=p.B,pt={P:{x:A.P.x+(B.P.x-A.P.x)*t,y:A.P.y+(B.P.y-A.P.y)*t}};
+  for(const r of p.rig){const a=r.aa+r.da*t,l=r.la+(r.lb-r.la)*t,o=pt[r.pa];pt[r.c]={x:o.x+Math.cos(a)*l,y:o.y+Math.sin(a)*l}}
+  if(p.anc){const k=p.anc,alvo={x:A[k].x+(B[k].x-A[k].x)*t,y:A[k].y+(B[k].y-A[k].y)*t},dx=alvo.x-pt[k].x,dy=alvo.y-pt[k].y;
+    for(const j in pt){pt[j].x+=dx;pt[j].y+=dy}}
+  return pt;
+}
+// ritmo de academia: sobe, segura 1 segundo, desce devagar, respira
+const suave=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function ritmo(f,ciclico){
+  if(ciclico)return(1-Math.cos(f*Math.PI*2))/2;
+  if(f<.34)return suave(f/.34);if(f<.46)return 1;if(f<.9)return 1-suave((f-.46)/.44);return 0;
+}
+const unit=(x,y)=>{const l=Math.hypot(x,y)||1;return{x:x/l,y:y/l}};
+function membro(c,a,b,wa,wb,cor){
+  const n=unit(-(b.y-a.y),b.x-a.x);c.fillStyle=cor;c.beginPath();
+  c.moveTo(a.x+n.x*wa,a.y+n.y*wa);c.lineTo(b.x+n.x*wb,b.y+n.y*wb);c.lineTo(b.x-n.x*wb,b.y-n.y*wb);c.lineTo(a.x-n.x*wa,a.y-n.y*wa);c.closePath();c.fill();
+  c.beginPath();c.arc(a.x,a.y,wa,0,7);c.arc(b.x,b.y,wb,0,7);c.fill();
+}
+function tronco(c,P,S,n,k,frente){
+  const u={x:S.x-P.x,y:S.y-P.y};
+  const perf=frente?[[-.04,8.6,8.6],[.12,9.6,9.6],[.32,8,8],[.52,6.4,6.4],[.74,7.6,7.6],[.92,9.4,9.4],[1.03,7,7]]
+    :[[-.04,6,7.4],[.08,7,10],[.3,6,7.6],[.52,5.2,5.4],[.74,8.2,6],[.9,6.8,6.2],[1.02,4.2,4.6]];
+  const ptF=perf.map(([t,f])=>({x:P.x+u.x*t+n.x*f*k,y:P.y+u.y*t+n.y*f*k})),ptB=perf.map(([t,,b])=>({x:P.x+u.x*t-n.x*b*k,y:P.y+u.y*t-n.y*b*k}));
+  const pts=ptF.concat(ptB.reverse());c.beginPath();
+  const m=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});let s=m(pts[pts.length-1],pts[0]);c.moveTo(s.x,s.y);
+  for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length],q=m(a,b);c.quadraticCurveTo(a.x,a.y,q.x,q.y)}
+  c.closePath();
+}
+function sapato(c,K,F,n,cor,sola){
+  const sh=unit(F.x-K.x,F.y-K.y);let fd={x:-sh.y,y:sh.x};if(fd.x*n.x+fd.y*n.y<0)fd={x:-fd.x,y:-fd.y};
+  c.save();c.translate(F.x+fd.x*3+sh.x*1.5,F.y+fd.y*3+sh.y*1.5);c.rotate(Math.atan2(fd.y,fd.x));
+  c.fillStyle=cor;c.beginPath();c.ellipse(0,0,7,3.4,0,0,7);c.fill();c.fillStyle=sola;c.fillRect(-7,1.6,14,1.8);c.restore();
+}
 function desenhar(d,t,cor){
-  const {ctx,cv,p}=d,s=cv.width/200;
-  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(s,0,0,s,0,0);
-  const pt={};for(const k in p.A){const a=p.A[k],b=p.B[k]||a;pt[k]={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}}
-  ctx.lineCap="round";ctx.lineJoin="round";
-  ctx.strokeStyle=cor.line;ctx.fillStyle=cor.line;ctx.lineWidth=3;
-  if(p.floor)Ln(ctx,8,p.floor+2,192,p.floor+2);
-  if(p.props){ctx.strokeStyle=cor.muted;ctx.fillStyle=cor.line;ctx.lineWidth=2.5;p.props(ctx,pt)}
-  const m=pt[p.m];ctx.fillStyle=cor.accent;ctx.globalAlpha=.28;Ci(ctx,m.x,m.y,15);ctx.globalAlpha=1;
-  ctx.strokeStyle=cor.fg;ctx.lineWidth=6;ctx.globalAlpha=.35;
-  ctx.beginPath();ctx.moveTo(pt.P.x,pt.P.y);ctx.lineTo(pt.k.x,pt.k.y);ctx.lineTo(pt.f.x,pt.f.y);
-  ctx.moveTo(pt.S.x,pt.S.y);ctx.lineTo(pt.e.x,pt.e.y);ctx.lineTo(pt.w.x,pt.w.y);ctx.stroke();ctx.globalAlpha=1;
-  ctx.lineWidth=8;Ln(ctx,pt.S.x,pt.S.y,pt.P.x,pt.P.y);
-  ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(pt.P.x,pt.P.y);ctx.lineTo(pt.K.x,pt.K.y);ctx.lineTo(pt.F.x,pt.F.y);
-  ctx.moveTo(pt.S.x,pt.S.y);ctx.lineTo(pt.E.x,pt.E.y);ctx.lineTo(pt.W.x,pt.W.y);ctx.stroke();
-  ctx.fillStyle=cor.fg;Ci(ctx,pt.H.x,pt.H.y,9);
-  ctx.fillStyle=cor.accent;Ci(ctx,m.x,m.y,4.5);
+  const {ctx:c,cv,p}=d,s=cv.width/200;
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,cv.width,cv.height);c.setTransform(s,0,0,s,0,0);
+  const pt=posar(p,t);
+  c.lineCap="round";c.lineJoin="round";
+  // chão e sombra
+  const chao=(p.floor||126)+2;
+  const g=c.createLinearGradient(0,chao,0,140);g.addColorStop(0,cor.chao);g.addColorStop(1,cor.chao2);c.fillStyle=g;c.fillRect(0,chao,200,140-chao);
+  c.fillStyle=cor.chaoLinha;c.fillRect(0,chao,200,1);
+  const xs=[pt.P.x,pt.F.x,pt.f.x,pt.S.x],sx=(Math.min(...xs)+Math.max(...xs))/2,sw=Math.max(18,(Math.max(...xs)-Math.min(...xs))/2+10);
+  c.fillStyle="rgba(0,0,0,.13)";c.beginPath();c.ellipse(sx,chao+1.5,sw,3.2,0,0,7);c.fill();
+  // aparelhos
+  if(p.props){c.save();c.strokeStyle=cor.metal;c.fillStyle=cor.pad;c.lineWidth=2.5;p.props(c,pt);c.restore()}
+  const u=unit(pt.S.x-pt.P.x,pt.S.y-pt.P.y),n={x:-u.y*p.lado,y:u.x*p.lado},fr=DE_FRENTE.has(d.pz||p.nome);
+  const pele2=fr?cor.pele:cor.pele2,leg2=fr?cor.legging:cor.legging2,ten2=fr?cor.tenis:cor.tenis2;
+  const L=Math.hypot(pt.S.x-pt.P.x,pt.S.y-pt.P.y),k=Math.max(.8,Math.min(1.15,L/36));
+  // lado de trás (mais escuro)
+  membro(c,pt.S,pt.e,3.4,2.8,pele2);membro(c,pt.e,pt.w,2.8,2.2,pele2);
+  if(fr){c.fillStyle=pele2;c.beginPath();c.arc(pt.w.x,pt.w.y,2.9,0,7);c.fill()}
+  membro(c,pt.P,pt.k,(fr?6.4:7)*k,4.8,leg2);membro(c,pt.k,pt.f,4.6,2.8,leg2);sapato(c,pt.k,pt.f,fr?{x:pt.k.x<pt.K.x?-1:1,y:0}:n,ten2,cor.sola);
+  // pescoço e tronco
+  const base={x:pt.S.x+(pt.H.x-pt.S.x)*.5,y:pt.S.y+(pt.H.y-pt.S.y)*.5};membro(c,pt.S,base,3.3,3,cor.pele);
+  tronco(c,pt.P,pt.S,n,k,fr);c.fillStyle=cor.top;c.fill();
+  c.save();tronco(c,pt.P,pt.S,n,k,fr);c.clip();c.fillStyle=cor.legging;
+  const cint={x:pt.P.x+(pt.S.x-pt.P.x)*.32,y:pt.P.y+(pt.S.y-pt.P.y)*.32};
+  c.beginPath();c.moveTo(cint.x+n.x*20,cint.y+n.y*20);c.lineTo(cint.x-n.x*20,cint.y-n.y*20);c.lineTo(cint.x-n.x*20-u.x*30,cint.y-n.y*20-u.y*30);c.lineTo(cint.x+n.x*20-u.x*30,cint.y+n.y*20-u.y*30);c.fill();
+  // pele da barriga entre o top e a legging
+  const bar={x:pt.P.x+(pt.S.x-pt.P.x)*.4,y:pt.P.y+(pt.S.y-pt.P.y)*.4};c.strokeStyle=cor.pele;c.lineWidth=4.2*k;c.lineCap="butt";
+  c.beginPath();c.moveTo(bar.x+n.x*20,bar.y+n.y*20);c.lineTo(bar.x-n.x*20,bar.y-n.y*20);c.stroke();c.lineCap="round";
+  // brilho de volume
+  const lg=c.createLinearGradient(pt.P.x+n.x*10,pt.P.y+n.y*10,pt.P.x-n.x*10,pt.P.y-n.y*10);lg.addColorStop(0,"rgba(255,255,255,.18)");lg.addColorStop(1,"rgba(0,0,0,.12)");
+  c.fillStyle=lg;c.fillRect(0,0,200,140);c.restore();
+  // perna da frente
+  membro(c,pt.P,pt.K,(fr?6.4:7.6)*k,5.2,cor.legging);membro(c,pt.K,pt.F,5,3,cor.legging);sapato(c,pt.K,pt.F,fr?{x:pt.K.x<pt.k.x?-1:1,y:0}:n,cor.tenis,cor.sola);
+  // cabeça, cabelo e rabo de cavalo que balança
+  const up=unit(pt.H.x-pt.S.x,pt.H.y-pt.S.y),tras={x:-n.x,y:-n.y};
+  const raiz={x:pt.H.x+(up.x*.55+tras.x)*7,y:pt.H.y+(up.y*.55+tras.y)*7};
+  const alvo={x:raiz.x+tras.x*7-up.x*7,y:raiz.y+tras.y*7-up.y*7+3};
+  if(!fr){
+    if(!d.rabo||d.rabo.p!==p)d.rabo={p,x:alvo.x,y:alvo.y,vx:0,vy:0};
+    const rb=d.rabo;rb.vx=(rb.vx+(alvo.x-rb.x)*.18)*.72;rb.vy=(rb.vy+(alvo.y-rb.y)*.18)*.72;rb.x+=rb.vx;rb.y+=rb.vy;
+    c.strokeStyle=cor.cabelo;c.lineWidth=4.6;c.beginPath();c.moveTo(raiz.x,raiz.y);c.quadraticCurveTo(raiz.x+tras.x*5,raiz.y+tras.y*5,rb.x,rb.y);c.stroke();
+    c.lineWidth=3;c.beginPath();c.moveTo(rb.x,rb.y);c.lineTo(rb.x-up.x*3+tras.x*1.5,rb.y-up.y*3+tras.y*1.5);c.stroke();
+  }
+  c.fillStyle=cor.pele;c.beginPath();c.arc(pt.H.x,pt.H.y,8,0,7);c.fill();
+  if(!fr){c.beginPath();c.arc(pt.H.x+n.x*7.4-up.x*1.2,pt.H.y+n.y*7.4-up.y*1.2,1.7,0,7);c.fill()} // nariz: mostra para onde ela olha
+  const ang=fr?Math.atan2(up.y,up.x):Math.atan2(up.y*.9+tras.y*.75,up.x*.9+tras.x*.75);
+  c.fillStyle=cor.cabelo;c.beginPath();c.arc(pt.H.x,pt.H.y,8.6,ang-(fr?1.45:1.85),ang+(fr?1.45:1.85));c.closePath();c.fill();
+  if(fr){c.beginPath();c.arc(pt.H.x+up.x*8.5,pt.H.y+up.y*8.5,3.6,0,7);c.fill()} // coque visto de frente
+  else{c.fillStyle=cor.top;c.beginPath();c.arc(raiz.x,raiz.y,1.8,0,7);c.fill()}
+  // braço da frente
+  membro(c,pt.S,pt.E,3.8,3.1,cor.pele);membro(c,pt.E,pt.W,3.1,2.4,cor.pele);c.fillStyle=cor.pele;c.beginPath();c.arc(pt.W.x,pt.W.y,2.9,0,7);c.fill();
+  c.fillStyle=cor.top;c.beginPath();c.arc(pt.S.x,pt.S.y,4,0,7);c.fill();
+  // músculo trabalhado
+  const m=pt[p.m],rg=c.createRadialGradient(m.x,m.y,0,m.x,m.y,15);rg.addColorStop(0,cor.brilho);rg.addColorStop(1,"rgba(0,0,0,0)");
+  c.fillStyle=rg;c.beginPath();c.arc(m.x,m.y,15,0,7);c.fill();
 }
 let ult=performance.now(),cor=null,quadro=0;
-function lerCores(){const cs=getComputedStyle(document.documentElement);
-  cor={fg:cs.getPropertyValue("--fg").trim(),accent:cs.getPropertyValue("--accent").trim(),line:cs.getPropertyValue("--line").trim(),muted:cs.getPropertyValue("--muted").trim()}}
+function lerCores(){const cs=getComputedStyle(document.documentElement),v=k=>cs.getPropertyValue(k).trim();
+  cor={pele:v("--fig-skin"),pele2:v("--fig-skin-2"),cabelo:v("--fig-hair"),top:v("--accent"),legging:v("--fig-legs"),legging2:v("--fig-legs-2"),
+    tenis:v("--fig-shoe"),tenis2:v("--fig-shoe-2"),sola:v("--fig-sole"),metal:v("--eq-metal"),pad:v("--eq-pad"),chao:v("--floor"),chao2:v("--floor-2"),chaoLinha:v("--floor-line"),brilho:v("--glow")}}
 function loop(agora){
   const dt=Math.min(agora-ult,100);ult=agora;
   if(tela==="treino"){
     if(!cor||quadro++%60===0)lerCores();
-    demos.forEach(d=>{if(!d.pausa){d.ph=((d.ph??d.off)+dt/2600)%1;d.t=(1-Math.cos(d.ph*Math.PI*2))/2}if(d.vis!==false||!d.desenhado){desenhar(d,d.t,cor);d.desenhado=true}});
+    demos.forEach(d=>{const cic=CICLICO.has(d.pz);if(!d.pausa){d.ph=((d.ph??d.off)+dt/(cic?1500:3600))%1;d.t=ritmo(d.ph,cic)}
+      if(d.vis!==false||!d.desenhado){desenhar(d,d.t,cor);d.desenhado=true}});
   }
   requestAnimationFrame(loop);
 }
@@ -1256,15 +1466,27 @@ function gravarMedida(d,campos){
   if(S.medidas.length>60)S.medidas=S.medidas.slice(-60);
 }
 function copos(){const p=pesoAtual();return p?Math.min(16,Math.max(6,Math.ceil(p*35/250))):8}
-function renderAgua(){
-  const hojeIso=iso(new Date()),n=S.agua[hojeIso]||0,box=document.getElementById("agua");box.innerHTML="";
-  const meta=copos();
-  document.getElementById("aguaMeta").textContent=pesoAtual()?"Sua meta: "+meta+" copos ("+(meta*250/1000).toLocaleString("pt-BR")+" L), calculada pelo seu peso. Cada copo é 250 ml.":"Cada copo é 250 ml. Informe seu peso em Medidas ou na tela Nutrição para calcular sua meta.";
-  for(let i=0;i<Math.max(meta,n);i++){const b=document.createElement("button");b.type="button";b.className=i<n?"cheio":"";
-    b.setAttribute("aria-label","Copo "+(i+1)+(i<n?", bebido":""));
-    b.onclick=()=>{S.agua[hojeIso]=(i<n&&i===n-1)?i:i+1;salvar();renderAgua()};box.appendChild(b)}
-  document.getElementById("aguaTxt").textContent=(n*250>=1000?(n*250/1000).toLocaleString("pt-BR")+" L":n*250+" ml");
+const ml=n=>n*250>=1000?(n*250/1000).toLocaleString("pt-BR")+" L":n*250+" ml";
+function mudarAgua(novo){
+  const h=iso(new Date()),antes=S.agua[h]||0;novo=Math.max(0,Math.min(16,novo));
+  if(novo===antes)return;
+  S.agua[h]=novo;salvar(novo>antes?"Água salva: "+ml(novo):"Copo retirado: "+ml(novo));renderAgua();
+  try{if(novo>antes&&navigator.vibrate)navigator.vibrate(12)}catch(e){}
 }
+function renderAgua(){
+  const n=S.agua[iso(new Date())]||0,box=document.getElementById("agua");box.innerHTML="";
+  const meta=copos();
+  document.getElementById("aguaMeta").textContent=pesoAtual()?"Meta de "+meta+" copos, calculada pelo seu peso (35 ml por kg). Cada copo é 250 ml.":"Cada copo é 250 ml. Informe seu peso em Medidas ou na tela Nutrição para calcular sua meta.";
+  for(let i=0;i<Math.max(meta,n);i++){const b=document.createElement("button");b.type="button";b.className=i<n?"cheio":"";
+    b.setAttribute("aria-label","Copo "+(i+1)+(i<n?", bebido":", vazio"));
+    b.onclick=()=>{const atual=S.agua[iso(new Date())]||0;if(i>=atual)mudarAgua(i+1);else toast("Para tirar um copo, toque em −")};box.appendChild(b)}
+  document.getElementById("aguaTxt").textContent=ml(n);
+  document.getElementById("aguaDe").textContent=n>=meta?"Meta do dia batida!":"de "+ml(meta)+" · faltam "+(meta-n)+" copo"+(meta-n>1?"s":"");
+  document.getElementById("aguaBarra").style.width=Math.min(100,n/meta*100)+"%";
+  document.getElementById("aguaMenos").disabled=n===0;
+}
+document.getElementById("aguaMais").onclick=()=>mudarAgua((S.agua[iso(new Date())]||0)+1);
+document.getElementById("aguaMenos").onclick=()=>mudarAgua((S.agua[iso(new Date())]||0)-1);
 let medEdit=null,medApagar=null;
 function preencherMedidas(){
   const d=medEdit||iso(new Date()),m=S.medidas.find(x=>x.d===d)||{peso:null,cintura:null,quadril:null};
@@ -1815,8 +2037,10 @@ const fmt=s=>Math.floor(s/60)+":"+pad(s%60);
 function parar(){clearInterval(int);int=null;ini.textContent="Iniciar"}
 function tick(){rest=Math.max(0,Math.ceil((fim-Date.now())/1000));tempo.textContent=fmt(rest);
   if(rest<=0){parar();tempo.textContent="Já!";rest=0;try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}}}
-function definirDescanso(){if(int)return;dur=rest=P().descanso;tempo.textContent=fmt(rest)}
-document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{parar();dur=rest=+b.dataset.s;tempo.textContent=fmt(rest)});
+const chipsDescanso=[...document.querySelectorAll("#timer [data-s]")];
+function marcarDescanso(){chipsDescanso.forEach(b=>b.setAttribute("aria-pressed",+b.dataset.s===dur))}
+function definirDescanso(){if(int)return;dur=rest=S.descanso||P().descanso;tempo.textContent=fmt(rest);marcarDescanso()}
+chipsDescanso.forEach(b=>b.onclick=()=>{parar();dur=rest=+b.dataset.s;tempo.textContent=fmt(rest);S.descanso=dur;salvar();marcarDescanso()});
 ini.onclick=()=>{if(int){parar();return}if(rest<=0)rest=dur;fim=Date.now()+rest*1000;ini.textContent="Pausar";int=setInterval(tick,250)};
 
 /* ================= IA para dúvidas ================= */
@@ -1885,7 +2109,7 @@ pergunta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preve
 })();
 
 /* ================= Meus dados ================= */
-const VERSAO="2.3.1";
+const VERSAO="3.0.0";
 document.getElementById("versao").textContent=VERSAO;
 const apagar=document.getElementById("apagar"),confAp=document.getElementById("confirmaApagar");
 apagar.onclick=()=>{apagar.hidden=true;confAp.hidden=false;document.getElementById("naoApagar").focus()};
